@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forms.zarishsphere.com/schema/v2/form.json",
+  "title": "ZarishSphere Clinical Form Schema v2",
+  "description": "Enhanced master schema for ZarishSphere clinical forms with FHIR R5 compliance, Bangladesh DGHS profiles, HIPAA/GDPR considerations, and comprehensive internationalization support.",
+  "type": "object",
+  "required": ["$schema", "zsFormVersion", "formId", "formName", "fhirResource", "clinical_domain", "languages", "sections"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://forms.zarishsphere.com/schema/v2/form.json"
+    },
+    "zsFormVersion": { 
+      "type": "string", 
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "ZarishSphere form version following semantic versioning"
+    },
+    "formId": { 
+      "type": "string", 
+      "pattern": "^zs-form-[a-z0-9-]+$",
+      "description": "Unique form identifier following ZarishSphere naming convention"
+    },
+    "formName": { 
+      "type": "string",
+      "description": "Primary form name in English"
+    },
+    "formNameTranslations": {
+      "type": "object",
+      "description": "Form name translations in supported languages",
+      "properties": {
+        "en": { "type": "string" },
+        "bn": { "type": "string" },
+        "my": { "type": "string" },
+        "ur": { "type": "string" },
+        "hi": { "type": "string" },
+        "th": { "type": "string" }
+      }
+    },
+    "fhirResource": { 
+      "type": "string",
+      "description": "Primary FHIR R5 resource this form creates/updates",
+      "enum": ["Patient","Encounter","Observation","Condition","MedicationRequest","Procedure","DiagnosticReport","QuestionnaireResponse","ServiceRequest","CarePlan"]
+    },
+    "fhirProfile": { 
+      "type": "string",
+      "description": "Bangladesh DGHS FHIR profile URL",
+      "pattern": "^https://fhir\\.zarishsphere\\.com/StructureDefinition/.*"
+    },
+    "fhirVersion": { 
+      "type": "string", 
+      "const": "5.0.0",
+      "description": "FHIR version compliance"
+    },
+    "clinical_domain": {
+      "type": "string",
+      "description": "Clinical domain categorization",
+      "enum": ["registration","triage","vitals","anc","pnc","delivery","child-health","nutrition","mental-health","communicable-disease","ncd","emergency","laboratory","pharmacy","community","operations","surveillance","immunization","cancer-screening","hiv-tb","mch","referral"]
+    },
+    "program": { 
+      "type": "string",
+      "description": "Health program affiliation",
+      "enum": ["primary-care","emergency-response","refugee-health","communicable-disease","ncd-program","mch-program","hiv-program","tb-program","nutrition-program","mental-health-program","surgery-program","laboratory-program"]
+    },
+    "languages": {
+      "type": "array",
+      "description": "Supported languages for this form",
+      "items": { 
+        "type": "string", 
+        "enum": ["en","bn","my","ur","hi","th"] 
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "version": { 
+      "type": "string",
+      "description": "Form version (may differ from schema version)"
+    },
+    "status": { 
+      "type": "string", 
+      "enum": ["draft","active","retired","deprecated"],
+      "default": "draft",
+      "description": "Form publication status"
+    },
+    "lastUpdated": { 
+      "type": "string", 
+      "format": "date-time",
+      "description": "Last updated timestamp in ISO 8601 format"
+    },
+    "effectivePeriod": {
+      "type": "object",
+      "description": "Period when form is effective",
+      "properties": {
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" }
+      }
+    },
+    "securityClassification": {
+      "type": "string",
+      "description": "Data security classification per HIPAA/GDPR",
+      "enum": ["public","restricted","confidential","secret"],
+      "default": "restricted"
+    },
+    "privacySettings": {
+      "type": "object",
+      "description": "Privacy and consent settings",
+      "properties": {
+        "requiresExplicitConsent": { "type": "boolean", "default": true },
+        "dataRetentionPeriod": { "type": "string", "description": "ISO 8601 duration for data retention" },
+        "anonymizationRules": { 
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields to anonymize for reporting"
+        },
+        "gdprCompliance": {
+          "type": "object",
+          "properties": {
+            "dataController": { "type": "string" },
+            "legalBasis": { 
+              "type": "string",
+              "enum": ["consent","legal-obligation","vital-interests","public-task","legitimate-interests"]
+            },
+            "dataSubjectRights": {
+              "type": "array",
+              "items": { 
+                "type": "string",
+                "enum": ["access","rectification","erasure","restriction","portability","objection"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Section" }
+    },
+    "validationRules": {
+      "type": "array",
+      "description": "Cross-field validation rules",
+      "items": { "$ref": "#/$defs/ValidationRule" }
+    },
+    "workflows": {
+      "type": "array",
+      "description": "Clinical workflow integration",
+      "items": { "$ref": "#/$defs/Workflow" }
+    }
+  },
+  "$defs": {
+    "Section": {
+      "type": "object",
+      "required": ["sectionId", "label", "fields"],
+      "properties": {
+        "sectionId": { 
+          "type": "string",
+          "description": "Unique section identifier"
+        },
+        "label": { 
+          "$ref": "#/$defs/I18nLabel",
+          "description": "Section display label"
+        },
+        "description": { 
+          "$ref": "#/$defs/I18nLabel",
+          "description": "Section description"
+        },
+        "collapsed": { 
+          "type": "boolean",
+          "default": false,
+          "description": "Whether section should be collapsed by default"
+        },
+        "repeatable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether section can be repeated"
+        },
+        "maxRepeats": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of repeats if repeatable"
+        },
+        "conditionalDisplay": { 
+          "$ref": "#/$defs/Condition",
+          "description": "Condition for showing/hiding section"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Field" }
+        },
+        "securityLevel": {
+          "type": "string",
+          "enum": ["public","restricted","confidential","secret"],
+          "default": "restricted"
+        }
+      }
+    },
+    "Field": {
+      "type": "object",
+      "required": ["fieldId", "label", "type", "fhirPath"],
+      "properties": {
+        "fieldId": { 
+          "type": "string",
+          "description": "Unique field identifier within form"
+        },
+        "label": { 
+          "$ref": "#/$defs/I18nLabel",
+          "description": "Field display label"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text","number","date","datetime","select","multiselect","boolean","radio","textarea","calculated","file","signature","gps","barcode","phone","email","time","duration","range","attachment","coded"],
+          "description": "Field input type"
+        },
+        "required": { 
+          "type": "boolean",
+          "default": false,
+          "description": "Whether field is required"
+        },
+        "fhirPath": { 
+          "type": "string",
+          "description": "FHIRPath expression for field mapping"
+        },
+        "fhirProfile": {
+          "type": "string",
+          "description": "Specific FHIR profile for this field"
+        },
+        "loinc": { 
+          "type": "string",
+          "pattern": "^\\d{5}-\\d{1}$",
+          "description": "LOINC code for the observation/concept"
+        },
+        "snomed": { 
+          "type": "string",
+          "pattern": "^\\d+$",
+          "description": "SNOMED CT concept code"
+        },
+        "icd11": { 
+          "type": "string",
+          "description": "ICD-11 diagnosis code"
+        },
+        "bdConcept": {
+          "type": "string",
+          "description": "Bangladesh DGHS concept UUID or code"
+        },
+        "placeholder": { 
+          "$ref": "#/$defs/I18nLabel",
+          "description": "Field placeholder text"
+        },
+        "hint": { 
+          "$ref": "#/$defs/I18nLabel",
+          "description": "Field help/hint text"
+        },
+        "validation": { 
+          "$ref": "#/$defs/Validation",
+          "description": "Field validation rules"
+        },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Option" },
+          "description": "Options for select/radio/multiselect fields"
+        },
+        "conditionalDisplay": { 
+          "$ref": "#/$defs/Condition",
+          "description": "Condition for showing/hiding field"
+        },
+        "conditionalRequired": {
+          "$ref": "#/$defs/Condition",
+          "description": "Condition for making field required"
+        },
+        "alertCondition": { 
+          "$ref": "#/$defs/Alert",
+          "description": "Alert conditions for field"
+        },
+        "unit": { 
+          "type": "string",
+          "description": "Unit of measurement"
+        },
+        "defaultValue": {},
+        "calculatedExpression": {
+          "type": "string",
+          "description": "FHIRPath expression for calculated fields"
+        },
+        "dataEntry": {
+          "type": "object",
+          "description": "Data entry constraints",
+          "properties": {
+            "autoComplete": { "type": "boolean" },
+            "lookupTable": { "type": "string" },
+            "valueSet": { "type": "string" },
+            "codingSystem": { "type": "string" }
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "description": "Privacy settings for field",
+          "properties": {
+            "sensitive": { "type": "boolean", "default": false },
+            "encrypted": { "type": "boolean", "default": false },
+            "auditAccess": { "type": "boolean", "default": true },
+            "retentionPeriod": { "type": "string" }
+          }
+        }
+      }
+    },
+    "I18nLabel": {
+      "type": "object",
+      "required": ["en"],
+      "properties": {
+        "en": { "type": "string" },
+        "bn": { "type": "string" },
+        "my": { "type": "string" },
+        "ur": { "type": "string" },
+        "hi": { "type": "string" },
+        "th": { "type": "string" }
+      }
+    },
+    "Option": {
+      "type": "object",
+      "required": ["value", "label"],
+      "properties": {
+        "value": { "type": "string" },
+        "label": { "$ref": "#/$defs/I18nLabel" },
+        "loinc": { "type": "string" },
+        "snomed": { "type": "string" },
+        "icd11": { "type": "string" },
+        "bdConcept": { "type": "string" },
+        "code": {
+          "type": "object",
+          "description": "FHIR coding structure",
+          "properties": {
+            "system": { "type": "string" },
+            "code": { "type": "string" },
+            "display": { "type": "string" },
+            "version": { "type": "string" }
+          }
+        }
+      }
+    },
+    "Validation": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "minLength": { "type": "integer", "minimum": 0 },
+        "maxLength": { "type": "integer", "minimum": 0 },
+        "pattern": { "type": "string" },
+        "format": {
+          "type": "string",
+          "enum": ["email","phone","date","datetime","time","uri","uuid","nid","brn","passport"]
+        },
+        "errorMessage": { "$ref": "#/$defs/I18nLabel" },
+        "customRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule": { "type": "string" },
+              "message": { "$ref": "#/$defs/I18nLabel" }
+            }
+          }
+        }
+      }
+    },
+    "Condition": {
+      "type": "object",
+      "properties": {
+        "fieldId": { "type": "string" },
+        "operator": { 
+          "type": "string", 
+          "enum": ["eq","neq","gt","lt","gte","lte","in","notIn","exists","notExists","contains","startsWith","endsWith"] 
+        },
+        "value": {},
+        "logicalOperator": {
+          "type": "string",
+          "enum": ["and","or"],
+          "default": "and"
+        },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Condition" },
+          "description": "Nested conditions for complex logic"
+        }
+      }
+    },
+    "Alert": {
+      "type": "object",
+      "properties": {
+        "condition": { "type": "string" },
+        "severity": { 
+          "type": "string", 
+          "enum": ["info","warning","error","critical"] 
+        },
+        "message": { "$ref": "#/$defs/I18nLabel" },
+        "action": { "type": "string" },
+        "trigger": {
+          "type": "string",
+          "enum": ["onChange","onBlur","onLoad","onSubmit"]
+        }
+      }
+    },
+    "ValidationRule": {
+      "type": "object",
+      "properties": {
+        "ruleId": { "type": "string" },
+        "description": { "$ref": "#/$defs/I18nLabel" },
+        "condition": { "$ref": "#/$defs/Condition" },
+        "expression": { "type": "string" },
+        "errorMessage": { "$ref": "#/$defs/I18nLabel" },
+        "severity": {
+          "type": "string",
+          "enum": ["error","warning","info"],
+          "default": "error"
+        }
+      }
+    },
+    "Workflow": {
+      "type": "object",
+      "properties": {
+        "workflowId": { "type": "string" },
+        "name": { "$ref": "#/$defs/I18nLabel" },
+        "trigger": {
+          "type": "string",
+          "enum": ["onCreate","onUpdate","onSubmit","onApprove","onComplete"]
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": { "type": "string" },
+              "target": { "type": "string" },
+              "parameters": { "type": "object" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "ZarishSphere FHIR Engine",
+  "description": "Clinical Data Platform with FHIR R5 REST Engine",
+  "version": "1.0.0",
+  "type": "go",
+  "workspace": {
+    "root": "/home/ariful/Desktop/zarishsphere/_cloned/zs-core-fhir-engine",
+    "exclude": [
+      "**/node_modules",
+      "**/vendor",
+      "**/.git",
+      "**/dist",
+      "**/build"
+    ]
+  },
+  "rules": {
+    "directory": ".windsurf/rules",
+    "adr_pattern": "ADR-*.md",
+    "enforce_adrs": true
+  },
+  "workflows": {
+    "directory": ".windsurf/workflows",
+    "auto_execute": false
+  },
+  "security": {
+    "secrets_file": ".secrets.baseline",
+    "scan_on_save": true,
+    "exclude_patterns": [
+      "**/*_test.go",
+      "**/test/**",
+      "**/docs/**"
+    ]
+  },
+  "build": {
+    "commands": {
+      "build": "go build ./cmd/zs-core-fhir-engine",
+      "test": "go test ./...",
+      "lint": "golangci-lint run",
+      "docker": "docker build -t zs-core-fhir-engine ."
+    },
+    "artifacts": {
+      "binary": "zs-core-fhir-engine",
+      "image": "zs-core-fhir-engine:latest"
+    }
+  },
+  "environment": {
+    "go_version": "1.26.1",
+    "required_tools": [
+      "go",
+      "docker",
+      "git"
+    ],
+    "optional_tools": [
+      "golangci-lint",
+      "gitleaks"
+    ]
+  },
+  "integrations": {
+    "github": {
+      "owner": "zarishsphere",
+      "repo": "zs-core-fhir-engine",
+      "actions": true,
+      "dependabot": true
+    },
+    "docker": {
+      "registry": "ghcr.io",
+      "namespace": "zarishsphere"
+    }
+  }
+}

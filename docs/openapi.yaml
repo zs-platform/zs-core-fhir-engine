@@ -1,0 +1,1160 @@
+openapi: 3.1.0
+info:
+  title: "ZarishSphere FHIR Engine API"
+  description: |
+    FHIR R5 REST API server for ZarishSphere healthcare platform.
+    
+    ## Authentication
+    All endpoints require a valid SMART on FHIR 2.1 JWT Bearer token.
+    See https://docs.zarishsphere.com/auth for details.
+    
+    ## Versioning
+    API version is embedded in the URL: `/fhir/R5/` (FHIR version, not service version).
+    
+    ## Multi-Tenancy
+    All requests are tenant-isolated. The tenant ID is extracted from JWT claims.
+  version: "1.0.0"
+  contact:
+    name: "ZarishSphere Platform"
+    email: "platform@zarishsphere.com"
+    url: "https://zarishsphere.com"
+  license:
+    name: "Apache 2.0"
+    url: "https://www.apache.org/licenses/LICENSE-2.0"
+
+servers:
+  - url: "https://api.zarishsphere.com"
+    description: "Production"
+  - url: "http://localhost:8001"
+    description: "Local development"
+
+security:
+  - bearerAuth: []
+
+paths:
+  # FHIR Resource Endpoints
+  /fhir/R5/Patient:
+    get:
+      summary: "Search for Patient resources"
+      operationId: "searchPatient"
+      tags: ["Patient"]
+      parameters:
+        - name: "_id"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Search by FHIR resource ID"
+        - name: "family"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Patient family name"
+        - name: "given"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Patient given name"
+        - name: "birthdate"
+          in: "query"
+          schema:
+            type: "string"
+            format: "date"
+          description: "Patient birth date"
+        - name: "gender"
+          in: "query"
+          schema:
+            type: "string"
+            enum: ["male", "female", "other", "unknown"]
+          description: "Patient gender"
+        - name: "identifier"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Patient identifier (e.g., NID|ABC123)"
+        - name: "_count"
+          in: "query"
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 200
+            default: 20
+          description: "Limit results per page"
+        - name: "_offset"
+          in: "query"
+          schema:
+            type: "integer"
+            minimum: 0
+            default: 0
+          description: "Pagination offset"
+        - name: "_sort"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Sort results (e.g., -_lastUpdated)"
+        - name: "_tenant"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Multi-tenant search (ZS extension)"
+      responses:
+        "200":
+          description: "Successful search"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    
+    post:
+      summary: "Create a Patient resource"
+      operationId: "createPatient"
+      tags: ["Patient"]
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Patient"
+      responses:
+        "201":
+          description: "Patient created successfully"
+          headers:
+            Location:
+              schema:
+                type: "string"
+              description: "URL of the created resource"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /fhir/R5/Patient/{id}:
+    get:
+      summary: "Read a Patient resource by ID"
+      operationId: "readPatient"
+      tags: ["Patient"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Patient resource ID"
+      responses:
+        "200":
+          description: "Patient resource found"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    
+    put:
+      summary: "Update a Patient resource"
+      operationId: "updatePatient"
+      tags: ["Patient"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Patient resource ID"
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Patient"
+      responses:
+        "200":
+          description: "Patient updated successfully"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    
+    delete:
+      summary: "Soft delete a Patient resource"
+      operationId: "deletePatient"
+      tags: ["Patient"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Patient resource ID"
+      responses:
+        "204":
+          description: "Patient deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /fhir/R5/Observation:
+    get:
+      summary: "Search for Observation resources"
+      operationId: "searchObservation"
+      tags: ["Observation"]
+      parameters:
+        - name: "subject"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Subject reference (e.g., Patient/uuid)"
+        - name: "code"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Observation code (e.g., http://loinc.org|8310-5)"
+        - name: "date"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Observation date (e.g., ge2026-01-01)"
+        - name: "category"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Observation category (e.g., vital-signs)"
+        - name: "status"
+          in: "query"
+          schema:
+            type: "string"
+            enum: ["registered", "preliminary", "final", "amended", "corrected", "cancelled"]
+          description: "Observation status"
+        - name: "value-quantity"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Quantity value (e.g., gt37|Cel)"
+        - name: "_count"
+          in: "query"
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 200
+            default: 20
+          description: "Limit results per page"
+        - name: "_offset"
+          in: "query"
+          schema:
+            type: "integer"
+            minimum: 0
+            default: 0
+          description: "Pagination offset"
+      responses:
+        "200":
+          description: "Successful search"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/Bundle"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # FHIR Operations
+  /fhir/R5/metadata:
+    get:
+      summary: "Get CapabilityStatement"
+      operationId: "getCapabilityStatement"
+      tags: ["Operations"]
+      responses:
+        "200":
+          description: "CapabilityStatement returned"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/CapabilityStatement"
+
+  /fhir/R5/ValueSet/$expand:
+    get:
+      summary: "Expand a ValueSet"
+      operationId: "expandValueSet"
+      tags: ["Operations"]
+      parameters:
+        - name: "url"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+          description: "ValueSet URL to expand"
+        - name: "filter"
+          in: "query"
+          schema:
+            type: "string"
+          description: "Filter for concept selection"
+        - name: "count"
+          in: "query"
+          schema:
+            type: "integer"
+            default: 100
+          description: "Maximum number of concepts to return"
+      responses:
+        "200":
+          description: "ValueSet expanded successfully"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/ValueSet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /fhir/R5/Patient/$validate:
+    post:
+      summary: "Validate a Patient resource"
+      operationId: "validatePatient"
+      tags: ["Operations"]
+      requestBody:
+        required: true
+        content:
+          application/fhir+json:
+            schema:
+              $ref: "#/components/schemas/Patient"
+      responses:
+        "200":
+          description: "Resource is valid"
+          content:
+            application/fhir+json:
+              schema:
+                $ref: "#/components/schemas/OperationOutcome"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  # Health and Metrics
+  /health:
+    get:
+      summary: "Health check endpoint"
+      operationId: "healthCheck"
+      tags: ["System"]
+      description: "Returns health status (no authentication required)"
+      responses:
+        "200":
+          description: "System is healthy"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  status:
+                    type: "string"
+                    enum: ["healthy", "unhealthy"]
+                  timestamp:
+                    type: "string"
+                    format: "date-time"
+                  version:
+                    type: "string"
+
+  /metrics:
+    get:
+      summary: "Prometheus metrics endpoint"
+      operationId: "prometheusMetrics"
+      tags: ["System"]
+      description: "Returns Prometheus metrics (internal only)"
+      responses:
+        "200":
+          description: "Metrics returned"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+
+  # Authentication & SMART on FHIR 2.1 Endpoints
+  /auth/authorize:
+    get:
+      summary: "OAuth2 authorization endpoint"
+      operationId: "authorize"
+      tags: ["Authentication"]
+      description: "Initiates SMART on FHIR 2.1 authorization flow"
+      parameters:
+        - name: "response_type"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            enum: ["code"]
+        - name: "client_id"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "redirect_uri"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "scope"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "state"
+          in: "query"
+          schema:
+            type: "string"
+        - name: "aud"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "302":
+          description: "Redirect to authorization server"
+
+  /auth/token:
+    post:
+      summary: "OAuth2 token endpoint"
+      operationId: "token"
+      tags: ["Authentication"]
+      description: "Exchanges authorization code for access token"
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: "object"
+              properties:
+                grant_type:
+                  type: "string"
+                  enum: ["authorization_code", "refresh_token"]
+                code:
+                  type: "string"
+                refresh_token:
+                  type: "string"
+                client_id:
+                  type: "string"
+                client_secret:
+                  type: "string"
+                redirect_uri:
+                  type: "string"
+      responses:
+        "200":
+          description: "Token response"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  access_token:
+                    type: "string"
+                  token_type:
+                    type: "string"
+                  expires_in:
+                    type: "integer"
+                  refresh_token:
+                    type: "string"
+                  scope:
+                    type: "string"
+
+  /auth/.well-known/openid_configuration:
+    get:
+      summary: "OpenID Connect discovery document"
+      operationId: "openidConfig"
+      tags: ["Authentication"]
+      description: "Returns OpenID Connect configuration"
+      responses:
+        "200":
+          description: "Configuration document"
+
+  /auth/.well-known/jwks.json:
+    get:
+      summary: "JSON Web Key Set"
+      operationId: "jwks"
+      tags: ["Authentication"]
+      description: "Returns public keys for JWT validation"
+      responses:
+        "200":
+          description: "JWKS document"
+
+  # FHIR Subscriptions
+  /fhir/R5/Subscription:
+    get:
+      summary: "Search Subscriptions"
+      operationId: "searchSubscription"
+      tags: ["Subscriptions"]
+      responses:
+        "200":
+          description: "Bundle of Subscriptions"
+    post:
+      summary: "Create Subscription"
+      operationId: "createSubscription"
+      tags: ["Subscriptions"]
+      requestBody:
+        content:
+          application/fhir+json:
+            schema:
+              type: "object"
+      responses:
+        "201":
+          description: "Subscription created"
+
+  /fhir/R5/Subscription/{id}:
+    get:
+      summary: "Read Subscription"
+      operationId: "readSubscription"
+      tags: ["Subscriptions"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Subscription resource"
+    put:
+      summary: "Update Subscription"
+      operationId: "updateSubscription"
+      tags: ["Subscriptions"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Subscription updated"
+    delete:
+      summary: "Delete Subscription"
+      operationId: "deleteSubscription"
+      tags: ["Subscriptions"]
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Subscription deleted"
+
+  # Resource History
+  /fhir/R5/{resourceType}/{id}/_history:
+    get:
+      summary: "Get resource history"
+      operationId: "getHistory"
+      tags: ["History"]
+      parameters:
+        - name: "resourceType"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "_since"
+          in: "query"
+          schema:
+            type: "string"
+        - name: "_until"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Bundle of history entries"
+
+  /fhir/R5/{resourceType}/{id}/_history/{versionId}:
+    get:
+      summary: "Get specific version"
+      operationId: "getVersion"
+      tags: ["History"]
+      parameters:
+        - name: "resourceType"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "versionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Specific version of resource"
+
+  # Analytics Dashboard
+  /analytics/overview:
+    get:
+      summary: "Get analytics overview"
+      operationId: "getAnalyticsOverview"
+      tags: ["Analytics"]
+      parameters:
+        - name: "from"
+          in: "query"
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "to"
+          in: "query"
+          schema:
+            type: "string"
+            format: "date-time"
+      responses:
+        "200":
+          description: "Analytics overview"
+
+  /analytics/resources:
+    get:
+      summary: "Get resource statistics"
+      operationId: "getResourceStats"
+      tags: ["Analytics"]
+      responses:
+        "200":
+          description: "Resource statistics"
+
+  /analytics/trends:
+    get:
+      summary: "Get usage trends"
+      operationId: "getTrends"
+      tags: ["Analytics"]
+      parameters:
+        - name: "interval"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Usage trends"
+
+  # HL7 v2 Bridge
+  /hl7/v2/message:
+    post:
+      summary: "Receive HL7 v2 message"
+      operationId: "receiveHL7Message"
+      tags: ["HL7 Bridge"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                message:
+                  type: "string"
+                source:
+                  type: "string"
+      responses:
+        "201":
+          description: "Message transformed to FHIR"
+
+  /hl7/v2/messages:
+    get:
+      summary: "List HL7 messages"
+      operationId: "listHL7Messages"
+      tags: ["HL7 Bridge"]
+      responses:
+        "200":
+          description: "List of HL7 messages"
+
+  # DICOM
+  /dicom/studies:
+    post:
+      summary: "Store DICOM study"
+      operationId: "storeDICOM"
+      tags: ["DICOM"]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+      responses:
+        "201":
+          description: "DICOM study stored"
+
+  /dicom/search:
+    get:
+      summary: "Search DICOM images"
+      operationId: "searchDICOM"
+      tags: ["DICOM"]
+      parameters:
+        - name: "patientId"
+          in: "query"
+          schema:
+            type: "string"
+        - name: "modality"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Search results"
+
+  # AI/ML
+  /ml/models:
+    get:
+      summary: "List ML models"
+      operationId: "listModels"
+      tags: ["AI/ML"]
+      responses:
+        "200":
+          description: "List of models"
+    post:
+      summary: "Register ML model"
+      operationId: "registerModel"
+      tags: ["AI/ML"]
+      responses:
+        "201":
+          description: "Model registered"
+
+  /ml/models/{modelId}/predict:
+    post:
+      summary: "Make prediction"
+      operationId: "predict"
+      tags: ["AI/ML"]
+      parameters:
+        - name: "modelId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Prediction result"
+
+  # Offline Sync
+  /sync:
+    post:
+      summary: "Process sync request"
+      operationId: "sync"
+      tags: ["Offline Sync"]
+      responses:
+        "200":
+          description: "Sync response"
+
+  # Population Health
+  /population/registry:
+    get:
+      summary: "Get patient registry"
+      operationId: "getRegistry"
+      tags: ["Population Health"]
+      responses:
+        "200":
+          description: "Patient registry"
+
+  /population/caregaps:
+    get:
+      summary: "Identify care gaps"
+      operationId: "getCareGaps"
+      tags: ["Population Health"]
+      responses:
+        "200":
+          description: "Care gaps list"
+
+  /population/risk:
+    get:
+      summary: "Calculate risk scores"
+      operationId: "calculateRisk"
+      tags: ["Population Health"]
+      responses:
+        "200":
+          description: "Risk assessments"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"
+
+  schemas:
+    Bundle:
+      type: "object"
+      required: ["resourceType", "type"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["Bundle"]
+        type:
+          type: "string"
+          enum: ["searchset", "collection", "history", "transaction", "batch"]
+        id:
+          type: "string"
+        total:
+          type: "integer"
+        link:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BundleLink"
+        entry:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BundleEntry"
+
+    BundleLink:
+      type: "object"
+      required: ["relation", "url"]
+      properties:
+        relation:
+          type: "string"
+        url:
+          type: "string"
+
+    BundleEntry:
+      type: "object"
+      required: ["resource"]
+      properties:
+        fullUrl:
+          type: "string"
+        resource:
+          type: "object"
+          description: "FHIR resource"
+        search:
+          $ref: "#/components/schemas/BundleEntrySearch"
+
+    BundleEntrySearch:
+      type: "object"
+      properties:
+        mode:
+          type: "string"
+        score:
+          type: "integer"
+
+    Patient:
+      type: "object"
+      required: ["resourceType"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["Patient"]
+        id:
+          type: "string"
+        meta:
+          $ref: "#/components/schemas/Meta"
+        name:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/HumanName"
+        gender:
+          type: "string"
+        birthDate:
+          type: "string"
+          format: "date"
+        identifier:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Identifier"
+        address:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Address"
+
+    Observation:
+      type: "object"
+      required: ["resourceType", "code", "status"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["Observation"]
+        id:
+          type: "string"
+        meta:
+          $ref: "#/components/schemas/Meta"
+        status:
+          type: "string"
+          enum: ["registered", "preliminary", "final", "amended", "corrected", "cancelled"]
+        code:
+          $ref: "#/components/schemas/CodeableConcept"
+        subject:
+          $ref: "#/components/schemas/Reference"
+        effectiveDateTime:
+          type: "string"
+          format: "date-time"
+        valueQuantity:
+          $ref: "#/components/schemas/Quantity"
+
+    Meta:
+      type: "object"
+      properties:
+        lastUpdated:
+          type: "string"
+          format: "date-time"
+        versionId:
+          type: "string"
+        source:
+          type: "string"
+        tag:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Coding"
+
+    HumanName:
+      type: "object"
+      properties:
+        use:
+          type: "string"
+        family:
+          type: "string"
+        given:
+          type: "array"
+          items:
+            type: "string"
+
+    Identifier:
+      type: "object"
+      required: ["system", "value"]
+      properties:
+        system:
+          type: "string"
+        value:
+          type: "string"
+        type:
+          $ref: "#/components/schemas/CodeableConcept"
+
+    Address:
+      type: "object"
+      properties:
+        use:
+          type: "string"
+        city:
+          type: "string"
+        country:
+          type: "string"
+
+    CodeableConcept:
+      type: "object"
+      required: ["coding"]
+      properties:
+        coding:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Coding"
+        text:
+          type: "string"
+
+    Coding:
+      type: "object"
+      required: ["system", "code"]
+      properties:
+        system:
+          type: "string"
+        code:
+          type: "string"
+        display:
+          type: "string"
+
+    Reference:
+      type: "object"
+      required: ["reference"]
+      properties:
+        reference:
+          type: "string"
+        display:
+          type: "string"
+
+    Quantity:
+      type: "object"
+      properties:
+        value:
+          type: "number"
+        unit:
+          type: "string"
+        system:
+          type: "string"
+
+    CapabilityStatement:
+      type: "object"
+      required: ["resourceType", "status", "date", "kind"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["CapabilityStatement"]
+        status:
+          type: "string"
+        date:
+          type: "string"
+          format: "date-time"
+        kind:
+          type: "string"
+        format:
+          type: "string"
+        fhirVersion:
+          type: "string"
+
+    ValueSet:
+      type: "object"
+      required: ["resourceType", "status"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["ValueSet"]
+        status:
+          type: "string"
+        expansion:
+          $ref: "#/components/schemas/ValueSetExpansion"
+
+    ValueSetExpansion:
+      type: "object"
+      properties:
+        identifier:
+          type: "string"
+        timestamp:
+          type: "string"
+        total:
+          type: "integer"
+        contains:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ValueSetContains"
+
+    ValueSetContains:
+      type: "object"
+      properties:
+        system:
+          type: "string"
+        code:
+          type: "string"
+        display:
+          type: "string"
+
+    OperationOutcome:
+      type: "object"
+      required: ["resourceType", "issue"]
+      properties:
+        resourceType:
+          type: "string"
+          enum: ["OperationOutcome"]
+        issue:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OperationOutcomeIssue"
+
+    OperationOutcomeIssue:
+      type: "object"
+      required: ["severity", "code"]
+      properties:
+        severity:
+          type: "string"
+          enum: ["fatal", "error", "warning", "information"]
+        code:
+          type: "string"
+        details:
+          $ref: "#/components/schemas/CodeableConcept"
+        diagnostics:
+          type: "string"
+        expression:
+          type: "array"
+          items:
+            type: "string"
+
+  responses:
+    BadRequest:
+      description: "Bad request — invalid input"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    Unauthorized:
+      description: "Unauthorized — missing or invalid JWT"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    Forbidden:
+      description: "Forbidden — insufficient SMART scope"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    NotFound:
+      description: "Resource not found"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    Conflict:
+      description: "Version conflict — optimistic locking"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    UnprocessableEntity:
+      description: "FHIR validation failure"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+    InternalServerError:
+      description: "Internal server error"
+      content:
+        application/fhir+json:
+          schema:
+            $ref: "#/components/schemas/OperationOutcome"
+
+tags:
+  - name: "Patient"
+    description: "Patient resource operations"
+  - name: "Observation"
+    description: "Observation resource operations"
+  - name: "Operations"
+    description: "FHIR operations"
+  - name: "System"
+    description: "System health and metrics"

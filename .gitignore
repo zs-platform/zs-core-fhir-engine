@@ -1,0 +1,163 @@
+# Go binary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+build/
+bin/
+dist/
+/zs-core-fhir-engine
+/zs-fhir-engine
+
+# Go test files
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go module cache
+go.sum
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+config/production.env
+
+# Log files
+logs/
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS files
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
+backup_*.sql
+
+# Docker files
+.dockerignore
+
+# Kubernetes secrets
+secrets/
+*.key
+*.crt
+*.pem
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation build
+docs/_build/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
+# Test data
+test-data/
+*.test.json
+*.test.xml
+
+# Performance profiling
+*.prof
+*.pprof
+
+# Security scan results
+.secrets.baseline
+gitleaks-report.json
+trivy-results.*
+
+# Local development
+.local/
+local/
+
+# Build artifacts
+*.tar.gz
+*.zip
+*.rar
+
+# Monitoring and metrics
+prometheus_data/
+grafana_data/
+
+# Database data directories
+postgres_data/
+redis_data/
+nats_data/
+keycloak_data/
+
+# Configuration overrides
+config/local/
+config/override/
+
+# Cache directories
+.cache/
+.cache-go/
+
+# Vendor directory (if used)
+vendor/
+
+# Make logs
+make.log
+
+# Terraform (if any)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Helm charts (if any)
+charts/*.tgz
+
+# Local scripts
+scripts/local/
+scripts/dev/
+
+# Experimental features
+experimental/
+sandbox/
+
+# Generated files
+generated/
+autogen/
+
+# Profiling and benchmarking
+benchmark/
+profile/
+
+# Load testing
+load-test-results/
+
+# Migration backups
+migrations/backups/
+migrations/rollback/

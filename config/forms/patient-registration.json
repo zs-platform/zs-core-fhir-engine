@@ -1,0 +1,890 @@
+{
+  "$schema": "https://forms.zarishsphere.com/schema/v2/form.json",
+  "zsFormVersion": "2.0.0",
+  "formId": "zs-form-patient-registration-v2",
+  "formName": "Comprehensive Patient Registration",
+  "formNameTranslations": {
+    "en": "Comprehensive Patient Registration",
+    "bn": "বিস্তারিত রোগী নিবন্ধন",
+    "my": "လူနာမှတ်ပုံတင်ခြင်းအပြည့်အစွင်း",
+    "ur": "مکمل بیمہ اندراج",
+    "hi": "व्यापक रोगी पंजीकरण",
+    "th": "การลงทะเบียนผู้ป่วยแบบครบถ้วน"
+  },
+  "fhirResource": "Patient",
+  "fhirProfile": "https://fhir.zarishsphere.com/StructureDefinition/zs-patient-v2",
+  "fhirVersion": "5.0.0",
+  "clinical_domain": "registration",
+  "program": "primary-care",
+  "languages": ["en", "bn", "my", "ur", "hi", "th"],
+  "version": "2.0.0",
+  "status": "active",
+  "lastUpdated": "2026-04-03T12:00:00Z",
+  "securityClassification": "restricted",
+  "privacySettings": {
+    "requiresExplicitConsent": true,
+    "dataRetentionPeriod": "P25Y",
+    "anonymizationRules": ["consent_data_sharing", "research_identifiers"],
+    "gdprCompliance": {
+      "dataController": "ZarishSphere Health Authority",
+      "legalBasis": "consent",
+      "dataSubjectRights": ["access", "rectification", "erasure", "restriction", "portability", "objection"]
+    }
+  },
+  "sections": [
+    {
+      "sectionId": "sec-identity-demographics",
+      "label": { 
+        "en": "Identity & Demographics", 
+        "bn": "পরিচয় ও জনসংখ্যাতত্ব", 
+        "my": "အမည်နှင့်လူမှုပ်ရှုအခြေအနေ", 
+        "ur": "شناخت و آبادیات", 
+        "hi": "पहचान और जनसांख्यात्मक", 
+        "th": "ข้อมูลระบุตัวตนและประชากร" 
+      },
+      "description": {
+        "en": "Basic patient identity and demographic information",
+        "bn": "মৌলিক রোগী পরিচয় ও জনসংখ্যাতত্ব তথ্য"
+      },
+      "fields": [
+        {
+          "fieldId": "given_name_en",
+          "label": { 
+            "en": "First Name (English)", 
+            "bn": "প্রথম নাম (ইংরেজী)", 
+            "my": "အမည် (အင်္ဂလိပ်)", 
+            "ur": "پہلا نام (انگریزی)", 
+            "hi": "पहला नाम (अंग्रेजी)", 
+            "th": "ชื่อ (ภาษาอังกฤษ)" 
+          },
+          "type": "text",
+          "required": true,
+          "fhirPath": "Patient.name[use=official].given",
+          "validation": { 
+            "minLength": 1, 
+            "maxLength": 100,
+            "pattern": "^[A-Za-z\\s\\-']+$",
+            "errorMessage": { 
+              "en": "Please enter a valid English name", 
+              "bn": "অনুগ্রহণ করুন একটি বৈধ ইংরেজী নাম" 
+            } 
+          },
+          "privacy": {
+            "sensitive": true,
+            "encrypted": true,
+            "auditAccess": true
+          }
+        },
+        {
+          "fieldId": "given_name_bn",
+          "label": { 
+            "en": "First Name (Bangla)", 
+            "bn": "প্রথম নাম (বাংলা)", 
+            "my": "အမည် (ဘင်ဂလိပ်)" 
+          },
+          "type": "text",
+          "required": true,
+          "fhirPath": "Patient.name[use=official].extension[nameBn].extension[content].valueString",
+          "validation": { 
+            "minLength": 1, 
+            "maxLength": 100,
+            "errorMessage": { 
+              "en": "Please enter a valid Bangla name", 
+              "bn": "অনুগ্রহণ করুন একটি বৈধ বাংলা নাম" 
+            } 
+          }
+        },
+        {
+          "fieldId": "family_name_en",
+          "label": { 
+            "en": "Family Name (English)", 
+            "bn": "পারিবারিক নাম (ইংরেজী)", 
+            "my": "မိသားစုနာမည် (အင်္ဂလိပ်)" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.name[use=official].family",
+          "validation": { 
+            "maxLength": 100,
+            "pattern": "^[A-Za-z\\s\\-']+$"
+          }
+        },
+        {
+          "fieldId": "family_name_bn",
+          "label": { 
+            "en": "Family Name (Bangla)", 
+            "bn": "পারিবারিক নাম (বাংলা)" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.name[use=official].extension[nameBnFamily].extension[content].valueString",
+          "validation": { 
+            "maxLength": 100
+          }
+        },
+        {
+          "fieldId": "date_of_birth",
+          "label": { 
+            "en": "Date of Birth", 
+            "bn": "জন্ম তারিখ", 
+            "my": "မွေးနေ့", 
+            "ur": "تاریخ پیدائش", 
+            "hi": "जन्म तिथि", 
+            "th": "วันเกิด" 
+          },
+          "type": "date",
+          "required": true,
+          "fhirPath": "Patient.birthDate",
+          "loinc": "21112-8",
+          "validation": { 
+            "errorMessage": { 
+              "en": "Date of birth cannot be in the future", 
+              "bn": "জন্ম তারিখ ভবিষ্যতে হতে পারে না" 
+            } 
+          },
+          "alertCondition": {
+            "condition": "age < 0",
+            "severity": "error",
+            "message": { 
+              "en": "Date of birth cannot be in the future", 
+              "bn": "জন্ম তারিখ ভবিষ্যতে হতে পারে না" 
+            },
+            "trigger": "onChange"
+          }
+        },
+        {
+          "fieldId": "age_estimate",
+          "label": { 
+            "en": "Estimated Age (if DOB unknown)", 
+            "bn": "আনুমানিক বয়স (জন্ম তারিখ অজানা হলে)", 
+            "my": "ခန့်မှန်းသက်တမ်း", 
+            "ur": "تخمینی عمر (اگر تاریخ پیدائش معلوم نہ ہو)" 
+          },
+          "type": "number",
+          "required": false,
+          "fhirPath": "Patient.extension[age-estimate].valueInteger",
+          "loinc": "29553-5",
+          "unit": "years",
+          "validation": { 
+            "min": 0, 
+            "max": 150 
+          },
+          "conditionalDisplay": { 
+            "fieldId": "date_of_birth", 
+            "operator": "eq", 
+            "value": null 
+          }
+        },
+        {
+          "fieldId": "gender",
+          "label": { 
+            "en": "Gender", 
+            "bn": "লিঙ্গ", 
+            "my": "ကျား/မ", 
+            "ur": "جنس", 
+            "hi": "लिंग", 
+            "th": "เพศ" 
+          },
+          "type": "radio",
+          "required": true,
+          "fhirPath": "Patient.gender",
+          "loinc": "76689-9",
+          "options": [
+            { 
+              "value": "male", 
+              "label": { 
+                "en": "Male", 
+                "bn": "পুরুষ", 
+                "my": "ကျား", 
+                "ur": "مرد", 
+                "hi": "पुरुष", 
+                "th": "ชาย" 
+              }, 
+              "snomed": "248153007",
+              "code": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "male",
+                "display": "Male"
+              }
+            },
+            { 
+              "value": "female", 
+              "label": { 
+                "en": "Female", 
+                "bn": "মহিলা", 
+                "my": "မ", 
+                "ur": "عورت", 
+                "hi": "महिला", 
+                "th": "หญิง" 
+              }, 
+              "snomed": "248152002",
+              "code": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "female",
+                "display": "Female"
+              }
+            },
+            { 
+              "value": "other", 
+              "label": { 
+                "en": "Other", 
+                "bn": "অন্যান্য", 
+                "my": "အခြား", 
+                "ur": "دیگر", 
+                "hi": "अन्य", 
+                "th": "อื่นๆ" 
+              }, 
+              "snomed": "184115007",
+              "code": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "other",
+                "display": "Other"
+              }
+            }
+          ]
+        },
+        {
+          "fieldId": "marital_status",
+          "label": { 
+            "en": "Marital Status", 
+            "bn": "বৈবাহিক অবস্থা", 
+            "my": "အိမ်ထောင်ရေးအခြေအနေ", 
+            "ur": "ازدواجی حیثیت" 
+          },
+          "type": "select",
+          "required": false,
+          "fhirPath": "Patient.maritalStatus.coding",
+          "loinc": "45404-1",
+          "options": [
+            { 
+              "value": "S", 
+              "label": { 
+                "en": "Single", 
+                "bn": "অবিবাহিত", 
+                "my": "လူပျိုမိန်းမ", 
+                "ur": "غیرشادی شدہ" 
+              },
+              "code": {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                "code": "S",
+                "display": "Never Married"
+              }
+            },
+            { 
+              "value": "M", 
+              "label": { 
+                "en": "Married", 
+                "bn": "বিবাহিত", 
+                "my": "လက်ထပ်ပြီး", 
+                "ur": "شادی شدہ" 
+              },
+              "code": {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                "code": "M",
+                "display": "Married"
+              }
+            },
+            { 
+              "value": "W", 
+              "label": { 
+                "en": "Widowed", 
+                "bn": "বিধবা/বিপত্নীক", 
+                "my": "မုဆိုးမ/ဖ", 
+                "ur": "بیوہ" 
+              },
+              "code": {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                "code": "W",
+                "display": "Widowed"
+              }
+            },
+            { 
+              "value": "D", 
+              "label": { 
+                "en": "Divorced", 
+                "bn": "বিবাহিবিচ্ছিন্ন", 
+                "my": "ကွာရှင်းပြတ်စဲပြီး", 
+                "ur": "طلاق یافتہ" 
+              },
+              "code": {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                "code": "D",
+                "display": "Divorced"
+              }
+            }
+          ]
+        },
+        {
+          "fieldId": "religion",
+          "label": { 
+            "en": "Religion", 
+            "bn": "ধর্ম", 
+            "my": "ဘာသာ", 
+            "ur": "مذہب" 
+          },
+          "type": "select",
+          "required": false,
+          "fhirPath": "Patient.extension[religion].valueCodeableConcept.coding",
+          "options": [
+            { 
+              "value": "islam", 
+              "label": { 
+                "en": "Islam", 
+                "bn": "ইসলাম", 
+                "my": "အစ္လားမ်", 
+                "ur": "اسلام" 
+              },
+              "bdConcept": "ISLAM"
+            },
+            { 
+              "value": "hinduism", 
+              "label": { 
+                "en": "Hinduism", 
+                "bn": "হিন্দুধর্ম", 
+                "my": "ဟိန္ဒူ" 
+              },
+              "bdConcept": "HINDUISM"
+            },
+            { 
+              "value": "buddhism", 
+              "label": { 
+                "en": "Buddhism", 
+                "bn": "বৌদ্ধধর্ম", 
+                "my": "ဗုဒ္ဓ" 
+              },
+              "bdConcept": "BUDDHISM"
+            },
+            { 
+              "value": "christianity", 
+              "label": { 
+                "en": "Christianity", 
+                "bn": "খ্রিস্টানধর্ম", 
+                "my": "ခရိယ်ယာ" 
+              },
+              "bdConcept": "CHRISTIANITY"
+            },
+            { 
+              "value": "other", 
+              "label": { 
+                "en": "Other", 
+                "bn": "অন্যান্য", 
+                "my": "အခြား" 
+              },
+              "bdConcept": "OTHER_RELIGION"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionId": "sec-identifiers",
+      "label": { 
+        "en": "Identifiers & IDs", 
+        "bn": "পরিচয়পত্র ও আইডি", 
+        "my": "အမှတ်ပုံတင်အထားနံပါတ်များ", 
+        "ur": "شناختی نمبر" 
+      },
+      "description": {
+        "en": "Patient identification documents and numbers",
+        "bn": "রোগী পরিচয়পত্র নথিপত্র ও নম্বর"
+      },
+      "fields": [
+        {
+          "fieldId": "patient_id_type",
+          "label": { 
+            "en": "Primary ID Type", 
+            "bn": "প্রধান আইডি ধরন", 
+            "my": "အဓိကမှတ်ပုံတင်အမျိုးအစား", 
+            "ur": "قسمی شناخت" 
+          },
+          "type": "select",
+          "required": false,
+          "fhirPath": "Patient.identifier[1].type.coding.code",
+          "options": [
+            { 
+              "value": "NID", 
+              "label": { 
+                "en": "National ID", 
+                "bn": "জাতীয় পরিচয়পত্র", 
+                "my": "အမျိုးသားမှတ်ပုံတင်", 
+                "ur": "قومی شناختی کارڈ" 
+              },
+              "code": {
+                "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-identifier-type",
+                "code": "NID",
+                "display": "National ID"
+              }
+            },
+            { 
+              "value": "BRN", 
+              "label": { 
+                "en": "Birth Registration Number", 
+                "bn": "জন্ম নিবন্ধন সনদ", 
+                "my": "မွေးစာရင်း", 
+                "ur": "پیدائش سرٹیفیکیٹ" 
+              },
+              "code": {
+                "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-identifier-type",
+                "code": "BRN",
+                "display": "Birth Registration Number"
+              }
+            },
+            { 
+              "value": "UNHCR", 
+              "label": { 
+                "en": "UNHCR Registration Card", 
+                "bn": "ইউএনএইচসিআর কার্ড", 
+                "my": "UNHCR မှတ်ပုံတင်ကတ်", 
+                "ur": "یو این ایچ سی آر کارڈ" 
+              }
+            },
+            { 
+              "value": "SMARTCARD", 
+              "label": { 
+                "en": "UNHCR Smart Card", 
+                "bn": "স্মার্ট কার্ড", 
+                "my": "UNHCR Smart Card", 
+                "ur": "سمارٹ کارڈ" 
+              }
+            },
+            { 
+              "value": "PASSPORT", 
+              "label": { 
+                "en": "Passport", 
+                "bn": "পাসপোর্ট", 
+                "my": "နိုင်ငံကူးလက်မှတ်", 
+                "ur": "پاسپورٹ" 
+              }
+            },
+            { 
+              "value": "PHONE", 
+              "label": { 
+                "en": "Phone Number only", 
+                "bn": "শুধুমাত্র মোবাইল নম্বর", 
+                "my": "ဖုန်းနံပါတ်သာ", 
+                "ur": "صرف فون نمبر" 
+              }
+            },
+            { 
+              "value": "NONE", 
+              "label": { 
+                "en": "No ID available", 
+                "bn": "কোনো পরিচয়পত্র নেই", 
+                "my": "မှတ်ပုံတင်မရှိ", 
+                "ur": "کوئی شناخت دستیاب نہیں" 
+              }
+            }
+          ]
+        },
+        {
+          "fieldId": "patient_id_number",
+          "label": { 
+            "en": "ID Number", 
+            "bn": "আইডি নম্বর", 
+            "my": "မှတ်ပုံတင်နံပါတ်", 
+            "ur": "شناختی نمبر" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.identifier[1].value",
+          "conditionalDisplay": { 
+            "fieldId": "patient_id_type", 
+            "operator": "neq", 
+            "value": "NONE" 
+          },
+          "validation": {
+            "customRules": [
+              {
+                "rule": "nid_validation",
+                "message": {
+                  "en": "Invalid National ID format",
+                  "bn": "অবৈধ জাতীয় পরিচয়পত্র বিন্যাস"
+                }
+              }
+            ]
+          },
+          "privacy": {
+            "sensitive": true,
+            "encrypted": true,
+            "auditAccess": true
+          }
+        },
+        {
+          "fieldId": "phone_number",
+          "label": { 
+            "en": "Phone Number", 
+            "bn": "মোবাইল নম্বর", 
+            "my": "ဖုန်းနံပါတ်", 
+            "ur": "فون نمبر", 
+            "hi": "फोन नंबर", 
+            "th": "หมายเลขโทรศัพท์" 
+          },
+          "type": "phone",
+          "required": false,
+          "fhirPath": "Patient.telecom[system=phone].value",
+          "loinc": "42077-8",
+          "validation": {
+            "format": "phone",
+            "errorMessage": {
+              "en": "Please enter a valid phone number",
+              "bn": "অনুগ্রহণ করুন একটি বৈধ মোবাইল নম্বর"
+            }
+          }
+        },
+        {
+          "fieldId": "email_address",
+          "label": { 
+            "en": "Email Address", 
+            "bn": "ইমেল ঠিকানা", 
+            "my": "အီးမေးလ်လိပ်က်" 
+          },
+          "type": "email",
+          "required": false,
+          "fhirPath": "Patient.telecom[system=email].value",
+          "validation": {
+            "format": "email",
+            "errorMessage": {
+              "en": "Please enter a valid email address",
+              "bn": "অনুগ্রহণ করুন একটি বৈধ ইমেল ঠিকানা"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": "sec-address-location",
+      "label": { 
+        "en": "Address & Location", 
+        "bn": "ঠিকানা ও অবস্থান", 
+        "my": "လိပ်စာ", 
+        "ur": "پتہ اور مقام" 
+      },
+      "description": {
+        "en": "Current residential address and location information",
+        "bn": "বর্তমান আবাসিক ঠিকানা ও অবস্থান তথ্য"
+      },
+      "fields": [
+        {
+          "fieldId": "address_line_1",
+          "label": { 
+            "en": "Address Line 1", 
+            "bn": "ঠিকানা লাইন ১", 
+            "my": "လိပ်စာလိုင်း ၁" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.address.line",
+          "validation": { 
+            "maxLength": 200 
+          }
+        },
+        {
+          "fieldId": "camp_block_village",
+          "label": { 
+            "en": "Camp / Block / Village", 
+            "bn": "ক্যাম্প / ব্লক / গ্রাম", 
+            "my": "ကင်မ်း / ဘလောက် / ရွာ", 
+            "ur": "کیمپ / بلاک / گاؤں" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.address.extension[camp-name].valueString"
+        },
+        {
+          "fieldId": "district_upazila",
+          "label": { 
+            "en": "District / Upazila", 
+            "bn": "জেলা / উপজেলা", 
+            "my": "ခရိုင်", 
+            "ur": "ضلع / تحصیل" 
+          },
+          "type": "text",
+          "required": false,
+          "fhirPath": "Patient.address.district"
+        },
+        {
+          "fieldId": "division",
+          "label": { 
+            "en": "Division", 
+            "bn": "বিভাগ", 
+            "my": "တိုင်းဒေသ" 
+          },
+          "type": "select",
+          "required": false,
+          "fhirPath": "Patient.address.extension[division].valueCodeableConcept.coding.code",
+          "options": [
+            { "value": "BD-1", "label": { "en": "Barishal", "bn": "বরিশাল" } },
+            { "value": "BD-2", "label": { "en": "Chattogram", "bn": "চট্টগ্রাম" } },
+            { "value": "BD-3", "label": { "en": "Dhaka", "bn": "ঢাকা" } },
+            { "value": "BD-4", "label": { "en": "Khulna", "bn": "খুলনা" } },
+            { "value": "BD-5", "label": { "en": "Rajshahi", "bn": "রাজশাহী" } },
+            { "value": "BD-6", "label": { "en": "Rangpur", "bn": "রংপুর" } },
+            { "value": "BD-7", "label": { "en": "Sylhet", "bn": "সিলেট" } }
+          ]
+        },
+        {
+          "fieldId": "country_of_origin",
+          "label": { 
+            "en": "Country of Origin", 
+            "bn": "মূল দেশ", 
+            "my": "မူလနိုင်ငံ", 
+            "ur": "آبائی ملک" 
+          },
+          "type": "select",
+          "required": false,
+          "fhirPath": "Patient.extension[nationality].valueCodeableConcept.coding.code",
+          "options": [
+            { 
+              "value": "BGD", 
+              "label": { 
+                "en": "Bangladesh", 
+                "bn": "বাংলাদেশ" 
+              },
+              "code": {
+                "system": "urn:iso:std:iso:3166",
+                "code": "BD",
+                "display": "Bangladesh"
+              }
+            },
+            { 
+              "value": "MMR", 
+              "label": { 
+                "en": "Myanmar (Rohingya)", 
+                "bn": "মিয়ানমার (রোহিঙ্গা)", 
+                "my": "မြန်မာ (ရိုဟင်ဂျာ)" 
+              },
+              "code": {
+                "system": "urn:iso:std:iso:3166",
+                "code": "MM",
+                "display": "Myanmar"
+              }
+            },
+            { 
+              "value": "IND", 
+              "label": { 
+                "en": "India", 
+                "bn": "ভারত", 
+                "hi": "भारत" 
+              },
+              "code": {
+                "system": "urn:iso:std:iso:3166",
+                "code": "IN",
+                "display": "India"
+              }
+            },
+            { 
+              "value": "PAK", 
+              "label": { 
+                "en": "Pakistan", 
+                "bn": "পাকিস্তান", 
+                "ur": "پاکستان" 
+              },
+              "code": {
+                "system": "urn:iso:std:iso:3166",
+                "code": "PK",
+                "display": "Pakistan"
+              }
+            },
+            { 
+              "value": "OTHER", 
+              "label": { 
+                "en": "Other", 
+                "bn": "অন্যান্য", 
+                "my": "အခြား", 
+                "ur": "دیگر" 
+              }
+            }
+          ]
+        },
+        {
+          "fieldId": "gps_coordinates",
+          "label": { 
+            "en": "GPS Coordinates (optional)", 
+            "bn": "জিপিএস অবস্থান (ঐচ্ছিক)", 
+            "my": "GPS တည်နေရာ", 
+            "ur": "جی پی ایس محل وقوع" 
+          },
+          "type": "gps",
+          "required": false,
+          "fhirPath": "Patient.address.extension[geolocation].extension[latitude].valueDecimal",
+          "privacy": {
+            "sensitive": true,
+            "auditAccess": true
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": "sec-consent-privacy",
+      "label": { 
+        "en": "Consent & Privacy", 
+        "bn": "সম্মতি ও গোপনীয়তা", 
+        "my": "သဘောတူညီမှု", 
+        "ur": "رضامندی اور رازداری" 
+      },
+      "description": {
+        "en": "Patient consent for treatment and data processing",
+        "bn": "চিকিৎসা ও ডেটা প্রক্রিয়ার জন্য রোগী সম্মতি"
+      },
+      "securityLevel": "confidential",
+      "fields": [
+        {
+          "fieldId": "consent_treatment",
+          "label": { 
+            "en": "Patient consents to treatment", 
+            "bn": "রোগী চিকিৎসায় সম্মতি দিয়েছেন", 
+            "my": "လူနာသည်ကုသမှုသဘောတူသည်", 
+            "ur": "مریض علاج کے لیے رضامند ہے" 
+          },
+          "type": "boolean",
+          "required": true,
+          "fhirPath": "Patient.extension[treatment-consent].valueBoolean",
+          "loinc": "59284-0",
+          "alertCondition": {
+            "condition": "value == false",
+            "severity": "warning",
+            "message": {
+              "en": "Patient consent is required for treatment",
+              "bn": "চিকিৎসার জন্য রোগী সম্মতি আবশ্যক"
+            },
+            "trigger": "onChange"
+          }
+        },
+        {
+          "fieldId": "consent_data_sharing",
+          "label": { 
+            "en": "Patient consents to data sharing for public health purposes", 
+            "bn": "রোগী জনস্বাস্থ্য উদ্দেশ্যে তথ্য শেয়ারে সম্মতি দিয়েছেন", 
+            "my": "ပြည်သူ့ကျန်းမာရေးအတွက်ဒေတာမျှဝေရန်သဘောတူသည်", 
+            "ur": "مریض صحت عامہ کے لیے ڈیٹا شیئرنگ پر رضامند ہے" 
+          },
+          "type": "boolean",
+          "required": false,
+          "fhirPath": "Patient.extension[data-sharing-consent].valueBoolean",
+          "loinc": "57016-8",
+          "privacy": {
+            "sensitive": true,
+            "auditAccess": true
+          }
+        },
+        {
+          "fieldId": "consent_research",
+          "label": { 
+            "en": "Patient consents to participation in clinical research", 
+            "bn": "ক্লিনিকাল গবেষণায় অংশগ্রহণের জন্য সম্মতি", 
+            "my": "ကလင်နိုင်းသုတေသနများပါဝင်စီးခြင်း" 
+          },
+          "type": "boolean",
+          "required": false,
+          "fhirPath": "Patient.extension[research-consent].valueBoolean",
+          "privacy": {
+            "sensitive": true,
+            "auditAccess": true,
+            "retentionPeriod": "P15Y"
+          }
+        },
+        {
+          "fieldId": "consent_recorded_by",
+          "label": { 
+            "en": "Consent recorded by", 
+            "bn": "সম্মতি গ্রহণকারী", 
+            "my": "သဘောတူညီမှုမှတ်တမ်းတင်သူ", 
+            "ur": "رضامندی لینے والا" 
+          },
+          "type": "text",
+          "required": true,
+          "fhirPath": "Patient.extension[consent-recorder].valueString",
+          "privacy": {
+            "auditAccess": true
+          }
+        },
+        {
+          "fieldId": "consent_date_time",
+          "label": { 
+            "en": "Consent Date & Time", 
+            "bn": "সম্মতি তারিখ ও সময়", 
+            "my": "သဘောတူညီမှုရက်စွဲ" 
+          },
+          "type": "datetime",
+          "required": true,
+          "fhirPath": "Patient.extension[consent-datetime].valueDateTime",
+          "defaultValue": "${currentDateTime}"
+        }
+      ]
+    }
+  ],
+  "validationRules": [
+    {
+      "ruleId": "age_validation",
+      "description": {
+        "en": "Validate age consistency",
+        "bn": "বয়সের সামঞ্জস্যতা যাচাই"
+      },
+      "condition": {
+        "fieldId": "date_of_birth",
+        "operator": "exists",
+        "value": true
+      },
+      "expression": "ageBetween(date_of_birth, 0, 150)",
+      "errorMessage": {
+        "en": "Age must be between 0 and 150 years",
+        "bn": "বয়স ০ থেকে ১৫০ বছরের মধ্যে হতে হবে"
+      },
+      "severity": "error"
+    },
+    {
+      "ruleId": "contact_info_validation",
+      "description": {
+        "en": "At least one contact method required",
+        "bn": "অন্তত একটি যোগাযোগ পদ্ধতি আবশ্যক"
+      },
+      "condition": {
+        "logicalOperator": "or",
+        "conditions": [
+          { "fieldId": "phone_number", "operator": "exists", "value": true },
+          { "fieldId": "email_address", "operator": "exists", "value": true }
+        ]
+      },
+      "expression": "phone_number || email_address",
+      "errorMessage": {
+        "en": "Please provide either phone number or email address",
+        "bn": "অনুগ্রহণ করুন ফোন নম্বর বা ইমেল ঠিকানা"
+      },
+      "severity": "warning"
+    }
+  ],
+  "workflows": [
+    {
+      "workflowId": "patient_registration_complete",
+      "name": {
+        "en": "Complete Patient Registration",
+        "bn": "সম্পূর্ণ রোগী নিবন্ধন"
+      },
+      "trigger": "onSubmit",
+      "actions": [
+        {
+          "action": "create_patient",
+          "target": "fhir-server",
+          "parameters": {
+            "resource": "Patient",
+            "profile": "zs-patient-v2"
+          }
+        },
+        {
+          "action": "generate_medical_record",
+          "target": "emr-system",
+          "parameters": {
+            "record_type": "initial"
+          }
+        },
+        {
+          "action": "assign_unique_id",
+          "target": "id-generator",
+          "parameters": {
+            "type": "UHID"
+          }
+        }
+      ]
+    }
+  ]
+}

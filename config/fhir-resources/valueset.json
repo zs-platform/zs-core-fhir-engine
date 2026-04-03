@@ -1,0 +1,388 @@
+{
+  "resourceType": "Bundle",
+  "id": "zs-value-sets-bundle-v2",
+  "type": "collection",
+  "timestamp": "2026-04-03T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/ValueSet/bd-identifier-types-v2",
+      "resource": {
+        "resourceType": "ValueSet",
+        "id": "zs-bd-identifier-types-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-value-set"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/valueset-bd-context",
+            "valueString": "Bangladesh healthcare identifier types"
+          }
+        ],
+        "url": "https://fhir.dghs.gov.bd/core/ValueSet/bd-identifier-type-valueset",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "bd-identifier-type-valueset"
+          }
+        ],
+        "version": "2.0.0",
+        "name": "Bangladesh Identifier Types",
+        "status": "active",
+        "experimental": false,
+        "date": "2026-04-03",
+        "publisher": "Directorate General of Health Services, Bangladesh",
+        "description": "Value set of identifier types used in Bangladesh healthcare system",
+        "compose": {
+          "include": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-identifier-type",
+              "concept": [
+                {
+                  "code": "NID",
+                  "display": "National ID",
+                  "definition": "Bangladesh National Identity Card number"
+                },
+                {
+                  "code": "BRN",
+                  "display": "Birth Registration Number",
+                  "definition": "Birth Registration Certificate number"
+                },
+                {
+                  "code": "UHID",
+                  "display": "Unique Health ID",
+                  "definition": "Unique Health Identifier for patient tracking"
+                },
+                {
+                  "code": "UNHCR",
+                  "display": "UNHCR Registration Card",
+                  "definition": "UNHCR refugee registration card number"
+                },
+                {
+                  "code": "SMARTCARD",
+                  "display": "UNHCR Smart Card",
+                  "definition": "UNHCR smart card identifier"
+                },
+                {
+                  "code": "PASSPORT",
+                  "display": "Passport",
+                  "definition": "International passport number"
+                },
+                {
+                  "code": "PHONE",
+                  "display": "Phone Number",
+                  "definition": "Mobile phone number as identifier"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/ValueSet/bd-religions-v2",
+      "resource": {
+        "resourceType": "ValueSet",
+        "id": "zs-bd-religions-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-value-set"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/valueset-bd-context",
+            "valueString": "Bangladesh religious affiliations"
+          }
+        ],
+        "url": "https://fhir.dghs.gov.bd/core/ValueSet/bd-religions-valueset",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "bd-religions-valueset"
+          }
+        ],
+        "version": "2.0.0",
+        "name": "Bangladesh Religions",
+        "status": "active",
+        "experimental": false,
+        "date": "2026-04-03",
+        "publisher": "Directorate General of Health Services, Bangladesh",
+        "description": "Value set of religions as recognized in Bangladesh healthcare system",
+        "compose": {
+          "include": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-religions",
+              "concept": [
+                {
+                  "code": "islam",
+                  "display": "Islam",
+                  "definition": "Islamic faith"
+                },
+                {
+                  "code": "hinduism",
+                  "display": "Hinduism",
+                  "definition": "Hindu faith"
+                },
+                {
+                  "code": "buddhism",
+                  "display": "Buddhism",
+                  "definition": "Buddhist faith"
+                },
+                {
+                  "code": "christianity",
+                  "display": "Christianity",
+                  "definition": "Christian faith"
+                },
+                {
+                  "code": "other_religion",
+                  "display": "Other Religion",
+                  "definition": "Other religious affiliations"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/ValueSet/bd-essential-medicines-v2",
+      "resource": {
+        "resourceType": "ValueSet",
+        "id": "zs-bd-essential-medicines-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-value-set"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/valueset-bd-context",
+            "valueString": "Bangladesh Essential Medicines List"
+          }
+        ],
+        "url": "https://fhir.dghs.gov.bd/core/ValueSet/bd-essential-medicines-valueset",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "bd-essential-medicines-valueset"
+          }
+        ],
+        "version": "2.0.0",
+        "name": "Bangladesh Essential Medicines",
+        "status": "active",
+        "experimental": false,
+        "date": "2026-04-03",
+        "publisher": "Directorate General of Drug Administration, Bangladesh",
+        "description": "Value set of essential medicines in Bangladesh healthcare system",
+        "compose": {
+          "include": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-essential-medicines",
+              "concept": [
+                {
+                  "code": "FE-IRON-TAB",
+                  "display": "Iron Folic Acid Tablets",
+                  "definition": "Iron and folic acid combination tablets"
+                },
+                {
+                  "code": "FE-IRON-SYRUP",
+                  "display": "Iron Syrup",
+                  "definition": "Iron syrup for pediatric use"
+                },
+                {
+                  "code": "ENALAPRIL-TAB",
+                  "display": "Enalapril Tablets",
+                  "definition": "ACE inhibitor for hypertension"
+                },
+                {
+                  "code": "AMOXICILLIN-CAP",
+                  "display": "Amoxicillin Capsules",
+                  "definition": "Amoxicillin antibiotic capsules"
+                },
+                {
+                  "code": "PARACETAMOL-TAB",
+                  "display": "Paracetamol Tablets",
+                  "definition": "Paracetamol analgesic tablets"
+                },
+                {
+                  "code": "ORS-SACHET",
+                  "display": "Oral Rehydration Salts",
+                  "definition": "ORS packets for dehydration"
+                },
+                {
+                  "code": "VIT-A-CAPS",
+                  "display": "Vitamin A Capsules",
+                  "definition": "Vitamin A capsules for supplementation"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/ValueSet/bd-communicable-diseases-v2",
+      "resource": {
+        "resourceType": "ValueSet",
+        "id": "zs-bd-communicable-diseases-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-value-set"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/valueset-bd-context",
+            "valueString": "Bangladesh communicable diseases for surveillance"
+          }
+        ],
+        "url": "https://fhir.dghs.gov.bd/core/ValueSet/bd-communicable-diseases-valueset",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "bd-communicable-diseases-valueset"
+          }
+        ],
+        "version": "2.0.0",
+        "name": "Bangladesh Communicable Diseases",
+        "status": "active",
+        "experimental": false,
+        "date": "2026-04-03",
+        "publisher": "Institute of Epidemiology, Disease Control and Research, Bangladesh",
+        "description": "Value set of communicable diseases under surveillance in Bangladesh",
+        "compose": {
+          "include": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-communicable-diseases",
+              "concept": [
+                {
+                  "code": "CHOLERA",
+                  "display": "Cholera",
+                  "definition": "Cholera infection"
+                },
+                {
+                  "code": "DIARRHEA",
+                  "display": "Diarrheal Disease",
+                  "definition": "Acute diarrheal disease"
+                },
+                {
+                  "code": "DENGUE",
+                  "display": "Dengue Fever",
+                  "definition": "Dengue viral infection"
+                },
+                {
+                  "code": "MALARIA",
+                  "display": "Malaria",
+                  "definition": "Malaria parasitic infection"
+                },
+                {
+                  "code": "TUBERCULOSIS",
+                  "display": "Tuberculosis",
+                  "definition": "Mycobacterium tuberculosis infection"
+                },
+                {
+                  "code": "COVID-19",
+                  "display": "COVID-19",
+                  "definition": "SARS-CoV-2 infection"
+                },
+                {
+                  "code": "MEASLES",
+                  "display": "Measles",
+                  "definition": "Measles viral infection"
+                },
+                {
+                  "code": "POLIO",
+                  "display": "Poliomyelitis",
+                  "definition": "Poliovirus infection"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/ValueSet/bd-facility-types-v2",
+      "resource": {
+        "resourceType": "ValueSet",
+        "id": "zs-bd-facility-types-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-value-set"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/valueset-bd-context",
+            "valueString": "Bangladesh healthcare facility types"
+          }
+        ],
+        "url": "https://fhir.dghs.gov.bd/core/ValueSet/bd-facility-types-valueset",
+        "identifier": [
+          {
+            "system": "urn:ietf:rfc:3986",
+            "value": "bd-facility-types-valueset"
+          }
+        ],
+        "version": "2.0.0",
+        "name": "Bangladesh Facility Types",
+        "status": "active",
+        "experimental": false,
+        "date": "2026-04-03",
+        "publisher": "Directorate General of Health Services, Bangladesh",
+        "description": "Value set of healthcare facility types in Bangladesh",
+        "compose": {
+          "include": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-facility-types",
+              "concept": [
+                {
+                  "code": "primary-health-center",
+                  "display": "Primary Health Center",
+                  "definition": "Primary level healthcare facility"
+                },
+                {
+                  "code": "community-clinic",
+                  "display": "Community Clinic",
+                  "definition": "Community-based healthcare facility"
+                },
+                {
+                  "code": "upazila-health-complex",
+                  "display": "Upazila Health Complex",
+                  "definition": "Upazila level healthcare facility"
+                },
+                {
+                  "code": "district-hospital",
+                  "display": "District Hospital",
+                  "definition": "District level hospital"
+                },
+                {
+                  "code": "medical-college-hospital",
+                  "display": "Medical College Hospital",
+                  "definition": "Teaching hospital with medical college"
+                },
+                {
+                  "code": "specialized-hospital",
+                  "display": "Specialized Hospital",
+                  "definition": "Specialized healthcare facility"
+                },
+                {
+                  "code": "laboratory",
+                  "display": "Laboratory",
+                  "definition": "Diagnostic laboratory facility"
+                },
+                {
+                  "code": "emergency-department",
+                  "display": "Emergency Department",
+                  "definition": "Emergency care facility"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

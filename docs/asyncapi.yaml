@@ -1,0 +1,535 @@
+asyncapi: 3.0.0
+info:
+  title: "ZarishSphere FHIR Engine Events"
+  version: "1.0.0"
+  description: |
+    AsyncAPI 3.0 specification for ZarishSphere FHIR Engine event streaming.
+    
+    All events follow the ZarishSphere event envelope schema and are published to NATS JetStream.
+    
+    ## Event Envelope
+    All events use the standard ZarishSphere event envelope schema defined in:
+    https://zarishsphere.com/schema/event/v1
+    
+    ## Subject Naming Convention
+    Events follow the naming pattern: `zs.{domain}.{resource}.{action}`
+    
+    ## Dead Letter Queue
+    Failed events are routed to: `zs.dlq.{original.subject}`
+
+servers:
+  production:
+    url: "nats://nats.zarishsphere.com:4222"
+    description: "Production NATS server"
+    protocol: "nats"
+  development:
+    url: "nats://localhost:4222"
+    description: "Development NATS server"
+    protocol: "nats"
+
+channels:
+  # Patient Events
+  patientCreated:
+    address: "zs.fhir.Patient.created"
+    messages:
+      patientCreated:
+        $ref: "#/components/messages/PatientCreated"
+    description: "Published when a new Patient resource is created"
+  
+  patientUpdated:
+    address: "zs.fhir.Patient.updated"
+    messages:
+      patientUpdated:
+        $ref: "#/components/messages/PatientUpdated"
+    description: "Published when a Patient resource is updated"
+  
+  patientDeleted:
+    address: "zs.fhir.Patient.deleted"
+    messages:
+      patientDeleted:
+        $ref: "#/components/messages/PatientDeleted"
+    description: "Published when a Patient resource is deleted"
+
+  # Observation Events
+  observationCreated:
+    address: "zs.fhir.Observation.created"
+    messages:
+      observationCreated:
+        $ref: "#/components/messages/ObservationCreated"
+    description: "Published when a new Observation resource is created"
+  
+  observationUpdated:
+    address: "zs.fhir.Observation.updated"
+    messages:
+      observationUpdated:
+        $ref: "#/components/messages/ObservationUpdated"
+    description: "Published when an Observation resource is updated"
+
+  # Encounter Events
+  encounterCreated:
+    address: "zs.fhir.Encounter.created"
+    messages:
+      encounterCreated:
+        $ref: "#/components/messages/EncounterCreated"
+    description: "Published when a new Encounter resource is created"
+  
+  encounterUpdated:
+    address: "zs.fhir.Encounter.updated"
+    messages:
+      encounterUpdated:
+        $ref: "#/components/messages/EncounterUpdated"
+    description: "Published when an Encounter resource is updated"
+
+  # Alert Events
+  criticalAlert:
+    address: "zs.alert.critical"
+    messages:
+      criticalAlert:
+        $ref: "#/components/messages/CriticalAlert"
+    description: "Published for critical clinical alerts"
+  
+  nutritionAlert:
+    address: "zs.alert.nutrition"
+    messages:
+      nutritionAlert:
+        $ref: "#/components/messages/NutritionAlert"
+    description: "Published for nutrition-related alerts"
+
+  # Platform Events
+  serviceHealth:
+    address: "zs.platform.service.health"
+    messages:
+      serviceHealth:
+        $ref: "#/components/messages/ServiceHealth"
+    description: "Published for service health status updates"
+
+  # Audit Events
+  auditEvent:
+    address: "zs.audit.event"
+    messages:
+      auditEvent:
+        $ref: "#/components/messages/AuditEvent"
+    description: "Published for audit logging events"
+
+  # Subscription Events
+  subscriptionTriggered:
+    address: "zs.fhir.Subscription.triggered"
+    messages:
+      subscriptionTriggered:
+        $ref: "#/components/messages/SubscriptionTriggered"
+    description: "Published when a FHIR Subscription is triggered"
+
+  # Sync Events
+  syncCompleted:
+    address: "zs.sync.completed"
+    messages:
+      syncCompleted:
+        $ref: "#/components/messages/SyncCompleted"
+    description: "Published when offline sync completes"
+
+  # Analytics Events
+  metricsUpdated:
+    address: "zs.analytics.metrics.updated"
+    messages:
+      metricsUpdated:
+        $ref: "#/components/messages/MetricsUpdated"
+    description: "Published when analytics metrics are updated"
+
+operations:
+  publishPatientCreated:
+    action: "send"
+    channel:
+      $ref: "#/channels/patientCreated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Patient.created"
+    
+  publishPatientUpdated:
+    action: "send"
+    channel:
+      $ref: "#/channels/patientUpdated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Patient.updated"
+    
+  publishPatientDeleted:
+    action: "send"
+    channel:
+      $ref: "#/channels/patientDeleted"
+    bindings:
+      nats:
+        subject: "zs.fhir.Patient.deleted"
+    
+  publishObservationCreated:
+    action: "send"
+    channel:
+      $ref: "#/channels/observationCreated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Observation.created"
+    
+  publishObservationUpdated:
+    action: "send"
+    channel:
+      $ref: "#/channels/observationUpdated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Observation.updated"
+    
+  publishEncounterCreated:
+    action: "send"
+    channel:
+      $ref: "#/channels/encounterCreated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Encounter.created"
+    
+  publishEncounterUpdated:
+    action: "send"
+    channel:
+      $ref: "#/channels/encounterUpdated"
+    bindings:
+      nats:
+        subject: "zs.fhir.Encounter.updated"
+    
+  publishCriticalAlert:
+    action: "send"
+    channel:
+      $ref: "#/channels/criticalAlert"
+    bindings:
+      nats:
+        subject: "zs.alert.critical"
+    
+  publishNutritionAlert:
+    action: "send"
+    channel:
+      $ref: "#/channels/nutritionAlert"
+    bindings:
+      nats:
+        subject: "zs.alert.nutrition"
+    
+  publishServiceHealth:
+    action: "send"
+    channel:
+      $ref: "#/channels/serviceHealth"
+    bindings:
+      nats:
+        subject: "zs.platform.service.health"
+
+  # Audit Events
+  publishAuditEvent:
+    action: "send"
+    channel:
+      $ref: "#/channels/auditEvent"
+    bindings:
+      nats:
+        subject: "zs.audit.event"
+
+  # Subscription Events
+  publishSubscriptionTriggered:
+    action: "send"
+    channel:
+      $ref: "#/channels/subscriptionTriggered"
+    bindings:
+      nats:
+        subject: "zs.fhir.Subscription.triggered"
+
+  # Sync Events
+  publishSyncCompleted:
+    action: "send"
+    channel:
+      $ref: "#/channels/syncCompleted"
+    bindings:
+      nats:
+        subject: "zs.sync.completed"
+
+  # Analytics Events
+  publishMetricsUpdated:
+    action: "send"
+    channel:
+      $ref: "#/channels/metricsUpdated"
+    bindings:
+      nats:
+        subject: "zs.analytics.metrics.updated"
+
+components:
+  messages:
+    PatientCreated:
+      name: "PatientCreated"
+      title: "Patient Created Event"
+      summary: "Event published when a new Patient resource is created"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+      examples:
+        - name: "PatientCreatedExample"
+          summary: "Example of a Patient created event"
+          payload:
+            $ref: "#/components/examples/PatientCreatedExample"
+    
+    PatientUpdated:
+      name: "PatientUpdated"
+      title: "Patient Updated Event"
+      summary: "Event published when a Patient resource is updated"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    PatientDeleted:
+      name: "PatientDeleted"
+      title: "Patient Deleted Event"
+      summary: "Event published when a Patient resource is deleted"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    ObservationCreated:
+      name: "ObservationCreated"
+      title: "Observation Created Event"
+      summary: "Event published when a new Observation resource is created"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    ObservationUpdated:
+      name: "ObservationUpdated"
+      title: "Observation Updated Event"
+      summary: "Event published when an Observation resource is updated"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    EncounterCreated:
+      name: "EncounterCreated"
+      title: "Encounter Created Event"
+      summary: "Event published when a new Encounter resource is created"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    EncounterUpdated:
+      name: "EncounterUpdated"
+      title: "Encounter Updated Event"
+      summary: "Event published when an Encounter resource is updated"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    CriticalAlert:
+      name: "CriticalAlert"
+      title: "Critical Alert Event"
+      summary: "Event published for critical clinical alerts"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    NutritionAlert:
+      name: "NutritionAlert"
+      title: "Nutrition Alert Event"
+      summary: "Event published for nutrition-related alerts"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    ServiceHealth:
+      name: "ServiceHealth"
+      title: "Service Health Event"
+      summary: "Event published for service health status updates"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    AuditEvent:
+      name: "AuditEvent"
+      title: "Audit Event"
+      summary: "Event published for audit logging"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    SubscriptionTriggered:
+      name: "SubscriptionTriggered"
+      title: "Subscription Triggered Event"
+      summary: "Event published when a FHIR Subscription is triggered"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    SyncCompleted:
+      name: "SyncCompleted"
+      title: "Sync Completed Event"
+      summary: "Event published when offline sync completes"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+    
+    MetricsUpdated:
+      name: "MetricsUpdated"
+      title: "Metrics Updated Event"
+      summary: "Event published when analytics metrics are updated"
+      contentType: "application/json"
+      payload:
+        $ref: "#/components/schemas/EventEnvelope"
+
+  schemas:
+    EventEnvelope:
+      type: "object"
+      required:
+        - "$schema"
+        - "id"
+        - "specVersion"
+        - "type"
+        - "source"
+        - "subject"
+        - "time"
+        - "dataContentType"
+        - "tenantId"
+        - "data"
+      properties:
+        "$schema":
+          type: "string"
+          format: "uri"
+          description: "JSON Schema URI for the event envelope"
+          example: "https://zarishsphere.com/schema/event/v1"
+        
+        id:
+          type: "string"
+          format: "uuid"
+          description: "Unique event identifier (UUID v7)"
+          example: "0192fbad-1234-7abc-def0-123456789012"
+        
+        specVersion:
+          type: "string"
+          description: "Event envelope specification version"
+          example: "1.0"
+        
+        type:
+          type: "string"
+          description: "Event type following ZarishSphere naming convention"
+          example: "zs.fhir.Patient.created"
+        
+        source:
+          type: "string"
+          description: "Source service that published the event"
+          example: "zs-svc-patient"
+        
+        subject:
+          type: "string"
+          description: "FHIR resource reference (ResourceType/ID)"
+          example: "Patient/0192fbad-1234-7abc-def0-123456789012"
+        
+        time:
+          type: "string"
+          format: "date-time"
+          description: "Timestamp when the event occurred"
+          example: "2026-03-24T10:00:00Z"
+        
+        dataContentType:
+          type: "string"
+          description: "Content type of the data payload"
+          example: "application/fhir+json"
+        
+        tenantId:
+          type: "string"
+          description: "Tenant identifier for multi-tenancy"
+          example: "bgd-cxb-camp-1w"
+        
+        data:
+          type: "object"
+          description: "FHIR resource payload"
+          example:
+            resourceType: "Patient"
+            id: "0192fbad-1234-7abc-def0-123456789012"
+            name:
+              - family: "Ahmed"
+                given: ["Mohammed"]
+            gender: "male"
+        
+        correlationId:
+          type: "string"
+          format: "uuid"
+          description: "Optional correlation ID for tracing related events"
+        
+        causationId:
+          type: "string"
+          format: "uuid"
+          description: "Optional causation ID linking to triggering events"
+
+  examples:
+    PatientCreatedExample:
+      summary: "Example of a Patient created event"
+      value:
+        "$schema": "https://zarishsphere.com/schema/event/v1"
+        id: "0192fbad-1234-7abc-def0-123456789012"
+        specVersion: "1.0"
+        type: "zs.fhir.Patient.created"
+        source: "zs-svc-patient"
+        subject: "Patient/0192fbad-1234-7abc-def0-123456789012"
+        time: "2026-03-24T10:00:00Z"
+        dataContentType: "application/fhir+json"
+        tenantId: "bgd-cxb-camp-1w"
+        data:
+          resourceType: "Patient"
+          id: "0192fbad-1234-7abc-def0-123456789012"
+          name:
+            - use: "official"
+              family: "Ahmed"
+              given: ["Mohammed"]
+          gender: "male"
+          birthDate: "1990-01-15"
+
+  bindings:
+    nats:
+      version: "0.2.0"
+      bindingVersion: "0.2.0"
+      protocol: "nats"
+      description: "NATS JetStream binding configuration"
+      extensions:
+        natsJetStream:
+          description: "NATS JetStream configuration"
+          properties:
+            stream:
+              type: "string"
+              description: "Stream name for the channel"
+              example: "zs_fhir_events"
+            consumers:
+              type: "array"
+              description: "Consumer configurations"
+              items:
+                type: "object"
+                properties:
+                  name:
+                    type: "string"
+                    description: "Consumer name"
+                  filterSubject:
+                    type: "string"
+                    description: "Subject filter for the consumer"
+                  deliverPolicy:
+                    type: "string"
+                    enum: ["all", "last", "new"]
+                    description: "Delivery policy for the consumer"
+                  ackPolicy:
+                    type: "string"
+                    enum: ["none", "all", "explicit"]
+                    description: "Acknowledgement policy for the consumer"
+                  replayPolicy:
+                    type: "string"
+                    enum: ["instant", "original"]
+                    description: "Replay policy for the consumer"
+                  sampleRate:
+                    type: "integer"
+                    description: "Sample rate for the consumer"
+                    minimum: 1
+                    maximum: 100
+
+tags:
+  - name: "Patient"
+    description: "Patient resource events"
+  - name: "Observation"
+    description: "Observation resource events"
+  - name: "Encounter"
+    description: "Encounter resource events"
+  - name: "Alerts"
+    description: "Clinical alert events"
+  - name: "Platform"
+    description: "Platform service events"

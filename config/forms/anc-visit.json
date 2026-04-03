@@ -1,0 +1,84 @@
+{
+  "$schema": "https://forms.zarishsphere.com/schema/v2/form.json",
+  "zsFormVersion": "2.0.0",
+  "formId": "zs-form-anc-visit-v2",
+  "formName": "Antenatal Care Visit",
+  "formNameTranslations": {
+    "en": "Antenatal Care Visit",
+    "bn": "প্রসবতালীয় যত্না সাক্ষাত",
+    "my": "ကိုယားစစေးခြင်းဆေးခြင်း",
+    "ur": "امریض کی دیکھانی",
+    "hi": "प्रसवती देखभाल"
+  },
+  "fhirResource": "Encounter",
+  "fhirProfile": "https://fhir.zarishsphere.com/StructureDefinition/zs-anc-encounter",
+  "fhirVersion": "5.0.0",
+  "clinical_domain": "anc",
+  "program": "mch-program",
+  "languages": ["en", "bn", "my", "ur", "hi"],
+  "version": "2.0.0",
+  "status": "active",
+  "lastUpdated": "2026-04-03T12:00:00Z",
+  "securityClassification": "restricted",
+  "sections": [
+    {
+      "sectionId": "sec-visit-details",
+      "label": { "en": "Visit Details", "bn": "সাক্ষাতের বিবরণ" },
+      "fields": [
+        {
+          "fieldId": "visit_date",
+          "label": { "en": "Visit Date", "bn": "সাক্ষাতের তারিখ" },
+          "type": "date",
+          "required": true,
+          "fhirPath": "Encounter.period.start"
+        },
+        {
+          "fieldId": "gestational_age",
+          "label": { "en": "Gestational Age (weeks)", "bn": "গর্ভাবস্থায় বয়স (সপ্তাহ)" },
+          "type": "number",
+          "required": true,
+          "fhirPath": "Encounter.extension[gestational-age].valueInteger",
+          "loinc": "49051-6",
+          "unit": "weeks",
+          "validation": { "min": 8, "max": 42 }
+        }
+      ]
+    },
+    {
+      "sectionId": "maternal-vitals",
+      "label": { "en": "Maternal Vital Signs", "bn": "মাতৃত্বগর্ভবস্থায়ীর অত্যাবরিক চিহ্নিত্সা" },
+      "fields": [
+        {
+          "fieldId": "bp_systolic",
+          "label": { "en": "Blood Pressure - Systolic", "bn": "রক্ত চাপ - সিস্টোলিক" },
+          "type": "number",
+          "required": true,
+          "fhirPath": "Encounter.reasonCode[0].coding[0].display",
+          "unit": "mmHg"
+        },
+        {
+          "fieldId": "bp_diastolic",
+          "label": { "en": "Blood Pressure - Diastolic", "bn": "রক্ত চাপ - ডায়াস্টোলিক" },
+          "type": "number",
+          "required": true,
+          "unit": "mmHg"
+        }
+      ]
+    },
+    {
+      "sectionId": "fetal-assessment",
+      "label": { "en": "Fetal Assessment", "bn": "ভ্রূণের মূল্যায়ন" },
+      "fields": [
+        {
+          "fieldId": "fetal_heart_rate",
+          "label": { "en": "Fetal Heart Rate", "bn": "ভ্রূণের হৃদয়ের হার" },
+          "type": "number",
+          "required": false,
+          "fhirPath": "Observation.valueQuantity.value",
+          "loinc": "73785-9",
+          "unit": "bpm"
+        }
+      ]
+    }
+  ]
+}

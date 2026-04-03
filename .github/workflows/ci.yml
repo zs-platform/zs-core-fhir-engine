@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Format check
+        run: |
+          UNFMT=$(find . -name '*.go' -not -path './vendor/*' -print0 | xargs -0 gofmt -l)
+          if [ -n "$UNFMT" ]; then
+            echo "The following files need formatting:" >&2
+            echo "$UNFMT" >&2
+            exit 1
+          fi
+
+      - name: Test
+        run: go test -v ./...

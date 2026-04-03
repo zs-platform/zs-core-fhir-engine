@@ -1,0 +1,56 @@
+{
+  "$schema": "https://zarishsphere.com/schema/event/v1",
+  "id": "uuid-v7-here",
+  "specVersion": "1.0",
+  "type": "zs.fhir.Patient.created",
+  "source": "zs-svc-patient",
+  "subject": "Patient/uuid",
+  "time": "2026-03-24T10:00:00Z",
+  "dataContentType": "application/fhir+json",
+  "tenantId": "bgd-cxb-camp-1w",
+  "data": {
+    "resourceType": "Patient",
+    "id": "uuid",
+    "meta": {
+      "lastUpdated": "2026-03-24T10:00:00Z",
+      "versionId": "1",
+      "source": "zs-svc-patient",
+      "tag": [
+        {
+          "system": "https://zarishsphere.com/tags/tenant",
+          "code": "bgd-cxb-camp-1w",
+          "display": "Cox's Bazar Camp 1W Health Post"
+        },
+        {
+          "system": "https://zarishsphere.com/tags/program",
+          "code": "bgd-refugee-response",
+          "display": "Bangladesh Refugee Response"
+        }
+      ]
+    },
+    "name": [
+      {
+        "use": "official",
+        "family": "Ahmed",
+        "given": ["Mohammed"]
+      }
+    ],
+    "gender": "male",
+    "birthDate": "1990-01-15",
+    "identifier": [
+      {
+        "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-identifier-type",
+        "value": "NID1234567890123",
+        "type": {
+          "coding": [
+            {
+              "system": "https://fhir.dghs.gov.bd/core/CodeSystem/bd-identifier-type",
+              "code": "NID",
+              "display": "National ID"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

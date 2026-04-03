@@ -1,0 +1,121 @@
+version: "2"
+
+run:
+  timeout: 10m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    - errcheck        # Check for unchecked errors
+    - govet           # Vet examines Go source code
+    - ineffassign     # Detect ineffectual assignments
+    - staticcheck     # Staticcheck is go vet on steroids
+    - unused          # Check for unused code
+    - misspell        # Check for commonly misspelled English words
+    # - revive          # Fast, configurable, extensible, flexible linter - DISABLED: too many naming convention suggestions
+    # - gosec           # Security-focused linter - DISABLED: too many false positives for integer conversions
+    - unconvert       # Remove unnecessary type conversions
+    # - prealloc        # Find slice declarations with non-zero initial length - DISABLED: performance optimization, not bugs
+    - gocritic        # The most opinionated Go linter
+    # - gocyclo         # Cyclomatic complexity - DISABLED: inherited from reference implementation
+    - bodyclose       # Check HTTP response body is closed
+    - nolintlint      # Ensure nolint directives are properly formatted
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+
+    govet:
+      enable-all: true
+      disable:
+        - shadow  # Can be too noisy for some codebases
+        - fieldalignment  # Disabled globally, re-enabled for production code only
+
+    gocyclo:
+      min-complexity: 15
+
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+      disabled-checks:
+        - unnamedResult  # Allow unnamed returns for short functions
+        - hugeParam      # May flag FHIR/DICOM structs with many fields
+        - dupImport      # False positive on cgo import "C" statements
+
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - "checkPrivateReceivers"
+            - "sayRepetitiveInsteadOfStutters"
+
+    misspell:
+      locale: US
+
+    staticcheck:
+      checks: [
+        "all",
+        "-ST1000",  # Package comment
+        "-ST1003",  # Naming conventions
+        "-ST1022",  # Comment formatting
+        "-ST1023",  # Redundant type in declaration
+        "-SA9003",  # Empty branch (intentional in some cases)
+        "-SA4010",  # Unused append result (fuzzing test artifact)
+        "-SA5011",  # Nil pointer dereference (false positive in fuzzing)
+        "-S1009",   # Nil check simplification (clarity over brevity)
+        "-QF1003",  # Tagged switch (subjective style)
+      ]
+
+  exclusions:
+    warn-unused: false
+    rules:
+      # Exclude some linters from running on tests files
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - errcheck
+          - gosec
+          - gocritic
+          - revive
+          - govet
+
+      # Exclude example code from strict checks
+      - path: "fhir/examples/.*\\.go$"
+        linters:
+          - errcheck
+          - gosec
+
+      # Exclude linters for generated FHIR resource files
+      - path: "fhir/r[45]/resources/.*\\.go$"
+        linters:
+          - gocyclo
+          - revive
+          - gocritic
+          - funlen
+          - misspell
+          - govet
+
+      # Exclude rangeValCopy for code generator files (performance not critical)
+      - path: "fhir/scripts/gen/.*\\.go$"
+        text: "rangeValCopy"
+        linters:
+          - gocritic
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  uniq-by-line: false
+  sort-results: true
+  sort-order:
+    - linter
+    - file

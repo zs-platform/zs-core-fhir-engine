@@ -1,0 +1,523 @@
+{
+  "resourceType": "Bundle",
+  "id": "zs-observation-bundle-v2",
+  "type": "collection",
+  "timestamp": "2026-04-03T12:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/Observation/vitals-panel-v2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "zs-vitals-panel-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-vitals-panel-v2"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z",
+          "source": "#zs-form-vitals-v2"
+        },
+        "extension": [
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/vitals-clinical-context",
+            "extension": [
+              {
+                "url": "measurementLocation",
+                "valueString": "Primary Health Center"
+              },
+              {
+                "url": "measurementDevice",
+                "valueString": "Digital BP Monitor"
+              },
+              {
+                "url": "clinicianNotes",
+                "valueString": "Patient appears well, no acute distress"
+              },
+              {
+                "url": "triageCategory",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://fhir.dghs.gov.bd/core/ValueSet/triage-categories-valueset",
+                      "code": "routine",
+                      "display": "Routine Check-up"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/vitals-pediatric-growth",
+            "extension": [
+              {
+                "url": "ageInMonths",
+                "valueInteger": 24
+              },
+              {
+                "url": "heightForAge",
+                "valueDecimal": 50.5
+              },
+              {
+                "url": "weightForAge",
+                "valueDecimal": 45.2
+              },
+              {
+                "url": "bmiForAge",
+                "valueDecimal": 16.8
+              }
+            ]
+          },
+          {
+            "url": "https://fhir.zarishsphere.com/StructureDefinition/vitals-bd-reference-ranges",
+            "extension": [
+              {
+                "url": "adultNormalRanges",
+                "extension": [
+                  {
+                    "url": "bpSystolic",
+                    "valueRange": {
+                      "low": {
+                        "value": 90,
+                        "unit": "mm[Hg]"
+                      },
+                      "high": {
+                        "value": 140,
+                        "unit": "mm[Hg]"
+                      }
+                    }
+                  },
+                  {
+                    "url": "bpDiastolic",
+                    "valueRange": {
+                      "low": {
+                        "value": 60,
+                        "unit": "mm[Hg]"
+                      },
+                      "high": {
+                        "value": 90,
+                        "unit": "mm[Hg]"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85353-1",
+              "display": "Vital signs panel"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/zs-patient-example-v2",
+          "display": "Mohammad Rahman"
+        },
+        "encounter": {
+          "reference": "Encounter/zs-vitals-encounter-v2",
+          "display": "Vital Signs Check-up"
+        },
+        "effectiveDateTime": "2026-04-03T10:00:00Z",
+        "performer": [
+          {
+            "reference": "Practitioner/community-health-worker-v2",
+            "display": "CHW Ahmed Ali"
+          }
+        ],
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 120,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 80,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8867-4",
+                  "display": "Heart rate"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 72,
+              "unit": "/min",
+              "system": "http://unitsofmeasure.org",
+              "code": "/min"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "9279-1",
+                  "display": "Respiratory rate"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 16,
+              "unit": "/min",
+              "system": "http://unitsofmeasure.org",
+              "code": "/min"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8310-5",
+                  "display": "Body temperature"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 36.8,
+              "unit": "Cel",
+              "system": "http://unitsofmeasure.org",
+              "code": "Cel"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "59408-5",
+                  "display": "Oxygen saturation"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 98,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8302-2",
+                  "display": "Body height"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 170,
+              "unit": "cm",
+              "system": "http://unitsofmeasure.org",
+              "code": "cm"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "29463-7",
+                  "display": "Body weight"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 70,
+              "unit": "kg",
+              "system": "http://unitsofmeasure.org",
+              "code": "kg"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "39156-5",
+                  "display": "Body mass index (BMI) [Ratio]"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 24.2,
+              "unit": "kg/m2",
+              "system": "http://unitsofmeasure.org",
+              "code": "kg/m2"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "2345-7",
+                  "display": "Glucose [Moles/volume] in Blood"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 5.2,
+              "unit": "mmol/L",
+              "system": "http://unitsofmeasure.org",
+              "code": "mmol/L"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "Normal"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "72514-3",
+                  "display": "Pain severity scale - 0-10 verbal numeric rating scale"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 0,
+              "unit": "{score}",
+              "system": "http://unitsofmeasure.org",
+              "code": "{score}"
+            },
+            "interpretation": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                  "code": "N",
+                  "display": "No Pain"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "85358-1",
+                  "display": "Location of pain"
+                }
+              ]
+            },
+            "valueString": "No pain reported"
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "67788-6",
+                  "display": "Level of consciousness"
+                }
+              ]
+            },
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "248220006",
+                  "display": "Alert"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "54128-1",
+                  "display": "General appearance"
+                }
+              ]
+            },
+            "valueString": "Well-nourished, alert, cooperative"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://fhir.zarishsphere.com/Observation/fetal-heart-rate-v2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "zs-fetal-heart-rate-v2",
+        "meta": {
+          "profile": ["https://fhir.zarishsphere.com/StructureDefinition/zs-fetal-heart-rate"],
+          "versionId": "1",
+          "lastUpdated": "2026-04-03T12:00:00Z",
+          "source": "#zs-form-anc-visit-v2"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "73785-9",
+              "display": "Fetal heart rate"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/zs-patient-example-v2",
+          "display": "Mohammad Rahman"
+        },
+        "encounter": {
+          "reference": "Encounter/zs-anc-encounter-v2",
+          "display": "ANC Visit"
+        },
+        "effectiveDateTime": "2026-04-03T09:30:00Z",
+        "performer": [
+          {
+            "reference": "Practitioner/anc-midwife-v2",
+            "display": "Dr. Fatema Begum"
+          }
+        ],
+        "valueQuantity": {
+          "value": 145,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        },
+        "interpretation": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+              "code": "N",
+              "display": "Normal"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

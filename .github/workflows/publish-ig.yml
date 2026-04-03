@@ -1,0 +1,78 @@
+name: Publish FHIR IG and Docs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install documentation dependencies
+        run: npm ci
+
+      - name: Build VitePress documentation
+        run: npm run docs:build
+
+      - name: Prepare publish directory
+        run: |
+          rm -rf public
+          mkdir -p public
+          cp -R docs/.vitepress/dist/* public/
+
+      - name: Setup Java (for IG Publisher)
+        if: ${{ hashFiles('ig.ini') != '' }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build FHIR IG (if present)
+        if: ${{ hashFiles('ig.ini') != '' }}
+        uses: qligier/fhir-ig-action@v0.3.0
+        with:
+          ig-publisher: latest
+          sushi: false
+
+      - name: Merge FHIR IG output into published site
+        if: ${{ hashFiles('output/index.html') != '' }}
+        run: |
+          mkdir -p public/ig
+          cp -R output/* public/ig/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy-pages:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
