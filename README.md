@@ -59,6 +59,7 @@ docker-compose -f docker-compose.yml up -d
 - [API Documentation](docs/api/overview.md)
 - [FHIR Profiles](docs/fhir/profiles.md)
 - [Deployment Guide](docs/guide/installation.md)
+- [Cloudflare Tunnel Guide](docs/guide/CLOUDFLARE-TUNNEL.md)
 - [Integration Examples](docs/examples/)
 
 ## 🔧 Configuration
