@@ -29,6 +29,7 @@ go.sum
 
 # Environment files
 .env
+.env.cloudflare
 .env.local
 .env.development
 .env.production
