@@ -51,7 +51,7 @@ go run cmd/fhir-engine/main.go serve
 docker build -t zarishsphere/zs-fhir-engine:latest .
 
 # Run with Docker Compose
-docker-compose -f tools/scripts/docker-compose.yml up -d
+docker-compose -f docker-compose.yml up -d
 ```
 
 ## 📚 Documentation
@@ -111,7 +111,7 @@ LOG_LEVEL=info
 ├── deploy/                 # Deployment configurations
 ├── docs/                   # Documentation
 ├── tools/                  # Development tools and scripts
-└── .windsurf/              # IDE configuration and workflows
+└── .agent/              # IDE configuration and workflows
 ```
 
 ## 📊 Features

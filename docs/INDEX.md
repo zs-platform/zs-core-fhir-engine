@@ -99,7 +99,7 @@ go build -o fhir-engine ./cmd/fhir-engine
 
 ### Health & Monitoring
 ```bash
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 curl http://localhost:8080/metrics
 ```
 
@@ -227,7 +227,7 @@ curl "http://localhost:8080/fhir/ValueSet/\$expand?url=http://id.who.int/icd/rel
 ### 1. Quick Test (5 minutes)
 ```bash
 ./scripts/production-deploy.sh
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 ```
 
 ### 2. Development Setup (15 minutes)

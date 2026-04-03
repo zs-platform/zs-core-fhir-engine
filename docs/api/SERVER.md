@@ -9,7 +9,7 @@ The zs-core-fhir-engine FHIR server is a lightweight, in-memory RESTful server t
 ./zs-core-fhir --server --port 8080
 
 # With custom IG path
-./zs-core-fhir --server --port 8080 --ig ./BD-Core-FHIR-IG
+./zs-core-fhir --server --port 8080 --ig ./config
 ```
 
 ## Command Line Options
@@ -19,7 +19,7 @@ The zs-core-fhir-engine FHIR server is a lightweight, in-memory RESTful server t
 | `--server` | `false` | Start the full FHIR server |
 | `--term-server` | `false` | Start the terminology server only |
 | `--port` | `8080` | Port to listen on |
-| `--ig` | `./BD-Core-FHIR-IG` | Path to FHIR Implementation Guide |
+| `--ig` | `./config` | Path to FHIR Implementation Guide |
 
 ## Server Features
 

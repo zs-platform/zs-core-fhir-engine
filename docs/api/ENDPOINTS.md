@@ -540,7 +540,7 @@ curl "http://localhost:8080/fhir/R5/ValueSet/\$expand?url=http://id.who.int/icd/
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/healthz` | GET | Health check |
+| `/health` | GET | Health check |
 | `/readyz` | GET | Readiness check |
 | `/metrics` | GET | Prometheus metrics |
 | `/version` | GET | API version info |
