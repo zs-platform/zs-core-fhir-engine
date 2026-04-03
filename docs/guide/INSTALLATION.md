@@ -89,7 +89,7 @@ sudo systemctl start postgresql
 # Clone and build
 git clone https://github.com/zarishsphere/zs-core-fhir-engine.git
 cd zs-core-fhir-engine
-go build -o zs-core-fhir-engine ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine ./cmd/fhir-engine
 ```
 
 ## 🍎 macOS Installation
@@ -105,7 +105,7 @@ brew services start postgresql
 # Clone and build
 git clone https://github.com/zarishsphere/zs-core-fhir-engine.git
 cd zs-core-fhir-engine
-go build -o zs-core-fhir-engine ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine ./cmd/fhir-engine
 
 # Setup database (optional)
 createdb fhir_db
@@ -128,7 +128,7 @@ choco install postgresql
 # Clone and build
 git clone https://github.com/zarishsphere/zs-core-fhir-engine.git
 cd zs-core-fhir-engine
-go build -o zs-core-fhir-engine.exe ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine.exe ./cmd/fhir-engine
 
 # Setup database (optional)
 createdb fhir_db
@@ -147,7 +147,7 @@ psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE fhir_db TO fhir_user;"
 ```powershell
 git clone https://github.com/zarishsphere/zs-core-fhir-engine.git
 cd zs-core-fhir-engine
-go build -o zs-core-fhir-engine.exe ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine.exe ./cmd/fhir-engine
 ```
 
 ## 🐳 Docker Installation
@@ -295,7 +295,7 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE fhir_db TO fhir_user;
 ./zs-core-fhir-engine serve --port 8080
 
 # Test health endpoint (in another terminal)
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 
 # Test FHIR endpoint
 curl http://localhost:8080/fhir/metadata
@@ -325,7 +325,7 @@ go mod download
 go test -v ./...
 
 # Build with debug info
-go build -gcflags="all=-N -l" -o zs-core-fhir-engine ./cmd/zs-core-fhir-engine
+go build -gcflags="all=-N -l" -o zs-core-fhir-engine ./cmd/fhir-engine
 
 # Install development tools
 go install github.com/cosmtrek/air@latest
@@ -413,8 +413,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /healthz {
-        proxy_pass http://localhost:8080/healthz;
+    location /health {
+        proxy_pass http://localhost:8080/health;
         access_log off;
     }
 }
@@ -465,7 +465,7 @@ go clean -modcache
 go mod download
 
 # Rebuild
-go build -o zs-core-fhir-engine ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine ./cmd/fhir-engine
 ```
 
 #### Permission Denied
@@ -474,7 +474,7 @@ go build -o zs-core-fhir-engine ./cmd/zs-core-fhir-engine
 chmod +x zs-core-fhir-engine
 
 # Or build with correct permissions
-go build -o zs-core-fhir-engine -mod=mod ./cmd/zs-core-fhir-engine
+go build -o zs-core-fhir-engine -mod=mod ./cmd/fhir-engine
 ```
 
 ### Logs and Debugging

@@ -27,7 +27,7 @@ This workflow builds the core FHIR R5 engine and its associated services based o
 ```bash
 cd /home/ariful/Desktop/zarishsphere/_cloned/zs-core-fhir-engine
 go mod tidy
-go build ./cmd/zs-core-fhir-engine
+go build ./cmd/fhir-engine
 ```
 
 **Docker Build**:
@@ -65,12 +65,12 @@ Verify that the FHIR engine builds correctly and all components function.
 # 1. Clean and build
 go clean -cache
 go mod tidy
-go build ./cmd/zs-core-fhir-engine
+go build -o build/zs-core-fhir-engine ./cmd/fhir-engine
 
 # 2. Test CLI
-./zs-core-fhir-engine --help
-./zs-core-fhir-engine version
-./zs-core-fhir-engine validate --help
+./build/zs-core-fhir-engine --help
+./build/zs-core-fhir-engine version
+./build/zs-core-fhir-engine validate --help
 
 # 3. Docker build (if Docker available)
 docker build -t zs-core-fhir-engine .
@@ -105,7 +105,7 @@ docker build -t zs-core-fhir-engine .
 
 ## Architecture Decisions Applied
 
-From `.windsurf/rules/` ADRs:
+From `.agent/rules/` ADRs:
 - **Go 1.26.1** backend language (ADR-0001)
 - **FHIR R5** data model (ADR-0002) 
 - **PostgreSQL 18.3** database (ADR-0003)

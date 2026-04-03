@@ -31,11 +31,12 @@ help:
 # Development targets
 build:
 	@echo "Building ZarishSphere FHIR Engine..."
-	go build -o build/zs-fhir-engine cmd/zs-core-fhir-engine/main.go
+	mkdir -p build
+	go build -o build/zs-core-fhir-engine ./cmd/fhir-engine
 
 run: build
 	@echo "Starting ZarishSphere FHIR Engine..."
-	./build/zs-fhir-engine serve
+	./build/zs-core-fhir-engine serve
 
 test:
 	@echo "Running tests..."

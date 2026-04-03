@@ -71,7 +71,7 @@ curl -X POST http://localhost:8080/auth/token \
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/healthz` | Health check (no auth) |
+| `GET` | `/health` | Health check (no auth) |
 | `GET` | `/readyz` | Readiness check |
 | `GET` | `/metrics` | Prometheus metrics |
 | `GET` | `/version` | API version info |
@@ -510,7 +510,7 @@ Basic search parameters are supported:
 ### Testing
 ```bash
 # Health check
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 
 # Server metadata
 curl http://localhost:8080/fhir/metadata

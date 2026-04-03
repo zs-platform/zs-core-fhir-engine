@@ -126,6 +126,11 @@ func (vm *VersionManager) GetHistory(ctx context.Context, resourceType, resource
 	return vm.store.GetHistory(ctx, resourceType, resourceID, options)
 }
 
+// GetAllVersions retrieves all versions for a resource.
+func (vm *VersionManager) GetAllVersions(ctx context.Context, resourceType, resourceID string) ([]ResourceVersion, error) {
+	return vm.store.GetAllVersions(ctx, resourceType, resourceID)
+}
+
 // RestoreVersion restores a resource to a specific version
 func (vm *VersionManager) RestoreVersion(ctx context.Context, resourceType, resourceID string, versionID int) (*ResourceVersion, error) {
 	return vm.store.RestoreVersion(ctx, resourceType, resourceID, versionID)

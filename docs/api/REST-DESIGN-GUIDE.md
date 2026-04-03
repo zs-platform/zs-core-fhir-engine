@@ -135,7 +135,7 @@ GET    /population/risk                                   # Risk scores
 ### System Health & Metrics
 
 ```
-GET    /healthz                                          # Health check (no auth)
+GET    /health                                          # Health check (no auth)
 GET    /readyz                                           # Readiness check
 GET    /metrics                                          # Prometheus metrics
 GET    /version                                          # API version info

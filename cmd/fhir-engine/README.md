@@ -59,7 +59,7 @@ go install ./cmd/fhir-engine
 ### Start with Custom IG
 
 ```bash
-./fhir-engine serve --port 8080 --ig ./BD-Core-FHIR-IG
+./fhir-engine serve --port 8080 --ig ./config
 ```
 
 ## FHIR Server Endpoints

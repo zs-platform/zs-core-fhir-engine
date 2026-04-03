@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -15,11 +16,11 @@ import (
 type AuditEvent struct {
 	ID              string                 `json:"id"`
 	Timestamp       time.Time              `json:"timestamp"`
-	EventType       string                 `json:"eventType"`      // create, read, update, delete, login, logout, export
+	EventType       string                 `json:"eventType"` // create, read, update, delete, login, logout, export
 	ResourceType    string                 `json:"resourceType"`
 	ResourceID      string                 `json:"resourceId,omitempty"`
 	Action          string                 `json:"action"`
-	Outcome         string                 `json:"outcome"`        // success, failure, partial
+	Outcome         string                 `json:"outcome"` // success, failure, partial
 	User            UserInfo               `json:"user"`
 	Tenant          TenantInfo             `json:"tenant"`
 	Client          ClientInfo             `json:"client"`
@@ -56,13 +57,13 @@ type ClientInfo struct {
 
 // RequestInfo contains request information
 type RequestInfo struct {
-	Method     string            `json:"method"`
-	URL        string            `json:"url"`
-	Path       string            `json:"path"`
-	Query      map[string]string `json:"query,omitempty"`
-	Headers    map[string]string `json:"headers,omitempty"`
-	BodySize   int               `json:"bodySize,omitempty"`
-	RequestID  string            `json:"requestId"`
+	Method    string            `json:"method"`
+	URL       string            `json:"url"`
+	Path      string            `json:"path"`
+	Query     map[string]string `json:"query,omitempty"`
+	Headers   map[string]string `json:"headers,omitempty"`
+	BodySize  int               `json:"bodySize,omitempty"`
+	RequestID string            `json:"requestId"`
 }
 
 // ResponseInfo contains response information
@@ -101,16 +102,16 @@ type AuditQuery struct {
 
 // ExportOptions contains options for exporting audit logs
 type ExportOptions struct {
-	Format    string // json, csv, fhir-audit
-	From      time.Time
-	To        time.Time
-	TenantID  string
+	Format     string // json, csv, fhir-audit
+	From       time.Time
+	To         time.Time
+	TenantID   string
 	EventTypes []string
 }
 
 // AdvancedAuditLogger provides comprehensive audit logging
 type AdvancedAuditLogger struct {
-	store AuditStore
+	store  AuditStore
 	config AuditConfig
 }
 
@@ -146,25 +147,25 @@ func (al *AdvancedAuditLogger) Log(ctx context.Context, event *AuditEvent) error
 	if !al.config.Enabled {
 		return nil
 	}
-	
+
 	if event.ID == "" {
 		event.ID = generateEventID()
 	}
-	
+
 	if event.Timestamp.IsZero() {
 		event.Timestamp = time.Now()
 	}
-	
+
 	// Check PHI logging restrictions
 	if event.Classification == "phi" && !al.config.LogPHI {
 		// Mask sensitive data
 		event.Data = map[string]interface{}{"masked": true}
 		event.Changes = nil
 	}
-	
+
 	// Add compliance flags
 	event.ComplianceFlags = al.getComplianceFlags(event)
-	
+
 	return al.store.Store(ctx, event)
 }
 
@@ -178,23 +179,23 @@ func (al *AdvancedAuditLogger) Export(ctx context.Context, options ExportOptions
 	if !al.config.ExportEnabled {
 		return nil, fmt.Errorf("export is not enabled")
 	}
-	
+
 	return al.store.Export(ctx, options)
 }
 
 // LogResourceAccess logs a resource access event
 func (al *AdvancedAuditLogger) LogResourceAccess(ctx context.Context, user UserInfo, tenant TenantInfo, resourceType, resourceID, action string, success bool) {
 	event := &AuditEvent{
-		EventType:    "read",
-		ResourceType: resourceType,
-		ResourceID:   resourceID,
-		Action:       action,
-		Outcome:      map[bool]string{true: "success", false: "failure"}[success],
-		User:         user,
-		Tenant:       tenant,
+		EventType:      "read",
+		ResourceType:   resourceType,
+		ResourceID:     resourceID,
+		Action:         action,
+		Outcome:        map[bool]string{true: "success", false: "failure"}[success],
+		User:           user,
+		Tenant:         tenant,
 		Classification: "phi",
 	}
-	
+
 	if err := al.Log(ctx, event); err != nil {
 		log.Errorf("Failed to log audit event: %v", err)
 	}
@@ -206,7 +207,7 @@ func (al *AdvancedAuditLogger) LogResourceChange(ctx context.Context, user UserI
 		Before: before,
 		After:  after,
 	}
-	
+
 	// Identify changed fields
 	if before != nil && after != nil {
 		for key := range after {
@@ -215,19 +216,19 @@ func (al *AdvancedAuditLogger) LogResourceChange(ctx context.Context, user UserI
 			}
 		}
 	}
-	
+
 	event := &AuditEvent{
-		EventType:    action,
-		ResourceType: resourceType,
-		ResourceID:   resourceID,
-		Action:       action,
-		Outcome:      map[bool]string{true: "success", false: "failure"}[success],
-		User:         user,
-		Tenant:       tenant,
-		Changes:      changes,
+		EventType:      action,
+		ResourceType:   resourceType,
+		ResourceID:     resourceID,
+		Action:         action,
+		Outcome:        map[bool]string{true: "success", false: "failure"}[success],
+		User:           user,
+		Tenant:         tenant,
+		Changes:        changes,
 		Classification: "phi",
 	}
-	
+
 	if err := al.Log(ctx, event); err != nil {
 		log.Errorf("Failed to log audit event: %v", err)
 	}
@@ -236,18 +237,18 @@ func (al *AdvancedAuditLogger) LogResourceChange(ctx context.Context, user UserI
 // LogAuthentication logs authentication events
 func (al *AdvancedAuditLogger) LogAuthentication(ctx context.Context, user UserInfo, tenant TenantInfo, client ClientInfo, action string, success bool, details map[string]interface{}) {
 	event := &AuditEvent{
-		EventType:    action,
-		ResourceType: "User",
-		ResourceID:   user.ID,
-		Action:       action,
-		Outcome:      map[bool]string{true: "success", false: "failure"}[success],
-		User:         user,
-		Tenant:       tenant,
-		Client:       client,
-		Data:         details,
+		EventType:      action,
+		ResourceType:   "User",
+		ResourceID:     user.ID,
+		Action:         action,
+		Outcome:        map[bool]string{true: "success", false: "failure"}[success],
+		User:           user,
+		Tenant:         tenant,
+		Client:         client,
+		Data:           details,
 		Classification: "restricted",
 	}
-	
+
 	if err := al.Log(ctx, event); err != nil {
 		log.Errorf("Failed to log audit event: %v", err)
 	}
@@ -256,7 +257,7 @@ func (al *AdvancedAuditLogger) LogAuthentication(ctx context.Context, user UserI
 // getComplianceFlags returns compliance flags for an event
 func (al *AdvancedAuditLogger) getComplianceFlags(event *AuditEvent) []string {
 	flags := make([]string, 0)
-	
+
 	switch al.config.ComplianceStandard {
 	case "HIPAA":
 		if event.Classification == "phi" {
@@ -265,7 +266,7 @@ func (al *AdvancedAuditLogger) getComplianceFlags(event *AuditEvent) []string {
 		if event.ResourceType == "Patient" || event.ResourceType == "Observation" {
 			flags = append(flags, "phi-access")
 		}
-		
+
 	case "GDPR":
 		if event.EventType == "export" {
 			flags = append(flags, "data-export")
@@ -273,13 +274,13 @@ func (al *AdvancedAuditLogger) getComplianceFlags(event *AuditEvent) []string {
 		if event.EventType == "delete" {
 			flags = append(flags, "right-to-erasure")
 		}
-		
+
 	case "Bangladesh_DGHS":
 		if event.ResourceType == "Patient" {
 			flags = append(flags, "dghs-regulated")
 		}
 	}
-	
+
 	return flags
 }
 
@@ -297,21 +298,21 @@ func NewAuditMiddleware(logger *AdvancedAuditLogger) *AuditMiddleware {
 func (am *AuditMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		
+
 		// Create response wrapper
 		rw := &auditResponseWriter{ResponseWriter: w, statusCode: 200}
-		
+
 		// Extract user info from context
 		user := extractUserInfo(r)
 		tenant := extractTenantInfo(r)
 		client := extractClientInfo(r)
-		
+
 		// Process request
 		next.ServeHTTP(rw, r)
-		
+
 		// Build audit event
 		duration := time.Since(start)
-		
+
 		event := &AuditEvent{
 			EventType:    getEventType(r.Method),
 			ResourceType: chi.URLParam(r, "resourceType"),
@@ -334,7 +335,7 @@ func (am *AuditMiddleware) Handler(next http.Handler) http.Handler {
 			},
 			Classification: "phi",
 		}
-		
+
 		// Log event
 		if err := am.logger.Log(r.Context(), event); err != nil {
 			log.Errorf("Failed to log audit event: %v", err)
@@ -374,14 +375,14 @@ func NewInMemoryAuditStore() *InMemoryAuditStore {
 func (s *InMemoryAuditStore) Store(ctx context.Context, event *AuditEvent) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	s.events = append(s.events, event)
-	
+
 	// Keep only last 10000 events in memory
 	if len(s.events) > 10000 {
 		s.events = s.events[len(s.events)-10000:]
 	}
-	
+
 	return nil
 }
 
@@ -389,9 +390,9 @@ func (s *InMemoryAuditStore) Store(ctx context.Context, event *AuditEvent) error
 func (s *InMemoryAuditStore) Query(ctx context.Context, query AuditQuery) ([]*AuditEvent, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	var results []*AuditEvent
-	
+
 	for _, event := range s.events {
 		// Apply filters
 		if len(query.EventTypes) > 0 && !contains(query.EventTypes, event.EventType) {
@@ -415,20 +416,20 @@ func (s *InMemoryAuditStore) Query(ctx context.Context, query AuditQuery) ([]*Au
 		if query.Outcome != "" && event.Outcome != query.Outcome {
 			continue
 		}
-		
+
 		results = append(results, event)
 	}
-	
+
 	// Apply pagination
 	if query.Offset >= len(results) {
 		return []*AuditEvent{}, nil
 	}
-	
+
 	end := query.Offset + query.Limit
 	if end > len(results) || query.Limit == 0 {
 		end = len(results)
 	}
-	
+
 	return results[query.Offset:end], nil
 }
 
@@ -436,9 +437,9 @@ func (s *InMemoryAuditStore) Query(ctx context.Context, query AuditQuery) ([]*Au
 func (s *InMemoryAuditStore) Export(ctx context.Context, options ExportOptions) ([]byte, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	var events []*AuditEvent
-	
+
 	for _, event := range s.events {
 		// Apply filters
 		if !options.From.IsZero() && event.Timestamp.Before(options.From) {
@@ -453,10 +454,10 @@ func (s *InMemoryAuditStore) Export(ctx context.Context, options ExportOptions) 
 		if len(options.EventTypes) > 0 && !contains(options.EventTypes, event.EventType) {
 			continue
 		}
-		
+
 		events = append(events, event)
 	}
-	
+
 	switch options.Format {
 	case "json":
 		return json.MarshalIndent(events, "", "  ")
@@ -501,7 +502,7 @@ func extractUserInfo(r *http.Request) UserInfo {
 	if userID == "" {
 		userID = "anonymous"
 	}
-	
+
 	return UserInfo{
 		ID:       userID,
 		Username: r.Header.Get("X-User-Name"),
@@ -524,7 +525,7 @@ func extractClientInfo(r *http.Request) ClientInfo {
 	if ip == "" {
 		ip = r.RemoteAddr
 	}
-	
+
 	return ClientInfo{
 		IP:        ip,
 		UserAgent: r.UserAgent(),

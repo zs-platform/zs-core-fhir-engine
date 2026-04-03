@@ -14,12 +14,12 @@
     ]
   },
   "rules": {
-    "directory": ".windsurf/rules",
+    "directory": ".agent/rules",
     "adr_pattern": "ADR-*.md",
     "enforce_adrs": true
   },
   "workflows": {
-    "directory": ".windsurf/workflows",
+    "directory": ".agent/workflows",
     "auto_execute": false
   },
   "security": {
@@ -33,13 +33,13 @@
   },
   "build": {
     "commands": {
-      "build": "go build ./cmd/zs-core-fhir-engine",
+      "build": "go build ./cmd/fhir-engine",
       "test": "go test ./...",
       "lint": "golangci-lint run",
       "docker": "docker build -t zs-core-fhir-engine ."
     },
     "artifacts": {
-      "binary": "zs-core-fhir-engine",
+      "binary": "build/zs-core-fhir-engine",
       "image": "zs-core-fhir-engine:latest"
     }
   },

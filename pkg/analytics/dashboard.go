@@ -3,12 +3,11 @@ package analytics
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sort"
+	"sync"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -27,27 +26,27 @@ type MetricsStore interface {
 
 // Metric represents a single metric data point
 type Metric struct {
-	Timestamp  time.Time              `json:"timestamp"`
-	Name       string                 `json:"name"`
-	Value      float64                `json:"value"`
-	Type       string                 `json:"type"` // counter, gauge, histogram
-	TenantID   string                 `json:"tenantId"`
-	UserID     string                 `json:"userId,omitempty"`
-	ResourceType string               `json:"resourceType,omitempty"`
-	Labels     map[string]string      `json:"labels,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Timestamp    time.Time              `json:"timestamp"`
+	Name         string                 `json:"name"`
+	Value        float64                `json:"value"`
+	Type         string                 `json:"type"` // counter, gauge, histogram
+	TenantID     string                 `json:"tenantId"`
+	UserID       string                 `json:"userId,omitempty"`
+	ResourceType string                 `json:"resourceType,omitempty"`
+	Labels       map[string]string      `json:"labels,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // MetricQuery contains query parameters for metrics
 type MetricQuery struct {
-	Names      []string
-	TenantID   string
+	Names        []string
+	TenantID     string
 	ResourceType string
-	From       time.Time
-	To         time.Time
-	Aggregation string // sum, avg, min, max
-	Interval   time.Duration
-	Limit      int
+	From         time.Time
+	To           time.Time
+	Aggregation  string // sum, avg, min, max
+	Interval     time.Duration
+	Limit        int
 }
 
 // TimePeriod represents a time period for aggregation
@@ -58,18 +57,18 @@ type TimePeriod struct {
 
 // Aggregates contains aggregated metrics
 type Aggregates struct {
-	Period       TimePeriod             `json:"period"`
-	TenantID     string                 `json:"tenantId"`
-	TotalRequests int64                 `json:"totalRequests"`
-	TotalResources int64                `json:"totalResources"`
-	ResourceBreakdown map[string]int64  `json:"resourceBreakdown"`
-	ResponseTimeAvg   float64            `json:"responseTimeAvg"`
-	ResponseTimeP95   float64            `json:"responseTimeP95"`
-	ResponseTimeP99   float64            `json:"responseTimeP99"`
-	ErrorRate         float64            `json:"errorRate"`
-	ActiveUsers       int64              `json:"activeUsers"`
-	TopEndpoints      []EndpointStat     `json:"topEndpoints"`
-	UsageByHour       map[int]int64      `json:"usageByHour"`
+	Period            TimePeriod       `json:"period"`
+	TenantID          string           `json:"tenantId"`
+	TotalRequests     int64            `json:"totalRequests"`
+	TotalResources    int64            `json:"totalResources"`
+	ResourceBreakdown map[string]int64 `json:"resourceBreakdown"`
+	ResponseTimeAvg   float64          `json:"responseTimeAvg"`
+	ResponseTimeP95   float64          `json:"responseTimeP95"`
+	ResponseTimeP99   float64          `json:"responseTimeP99"`
+	ErrorRate         float64          `json:"errorRate"`
+	ActiveUsers       int64            `json:"activeUsers"`
+	TopEndpoints      []EndpointStat   `json:"topEndpoints"`
+	UsageByHour       map[int]int64    `json:"usageByHour"`
 }
 
 // EndpointStat represents endpoint usage statistics
@@ -101,7 +100,7 @@ func (d *Dashboard) RecordMetric(ctx context.Context, metric Metric) error {
 	if metric.Timestamp.IsZero() {
 		metric.Timestamp = time.Now()
 	}
-	
+
 	return d.metricsStore.StoreMetric(ctx, metric)
 }
 
@@ -111,14 +110,14 @@ func (d *Dashboard) GetOverview(ctx context.Context, tenantID string, period Tim
 	if err != nil {
 		return nil, err
 	}
-	
+
 	overview := &DashboardOverview{
-		Period:       period,
-		TenantID:     tenantID,
-		Summary:      aggregates,
-		GeneratedAt:  time.Now(),
+		Period:      period,
+		TenantID:    tenantID,
+		Summary:     aggregates,
+		GeneratedAt: time.Now(),
 	}
-	
+
 	return overview, nil
 }
 
@@ -129,32 +128,32 @@ func (d *Dashboard) GetResourceStats(ctx context.Context, tenantID string, perio
 		From:     period.Start,
 		To:       period.End,
 	}
-	
+
 	metrics, err := d.metricsStore.QueryMetrics(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	stats := &ResourceStats{
-		Period:   period,
-		TenantID: tenantID,
+		Period:    period,
+		TenantID:  tenantID,
 		Resources: make(map[string]ResourceMetrics),
 	}
-	
+
 	// Aggregate by resource type
 	for _, metric := range metrics {
 		if metric.ResourceType == "" {
 			continue
 		}
-		
+
 		if _, exists := stats.Resources[metric.ResourceType]; !exists {
 			stats.Resources[metric.ResourceType] = ResourceMetrics{
 				ResourceType: metric.ResourceType,
 			}
 		}
-		
+
 		resourceMetrics := stats.Resources[metric.ResourceType]
-		
+
 		switch metric.Name {
 		case "resource_created":
 			resourceMetrics.Created++
@@ -165,10 +164,10 @@ func (d *Dashboard) GetResourceStats(ctx context.Context, tenantID string, perio
 		case "resource_deleted":
 			resourceMetrics.Deleted++
 		}
-		
+
 		stats.Resources[metric.ResourceType] = resourceMetrics
 	}
-	
+
 	return stats, nil
 }
 
@@ -181,20 +180,20 @@ func (d *Dashboard) GetUsageTrends(ctx context.Context, tenantID string, period 
 		To:       period.End,
 		Interval: interval,
 	}
-	
+
 	metrics, err := d.metricsStore.QueryMetrics(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Group by interval
 	buckets := make(map[time.Time][]Metric)
-	
+
 	for _, metric := range metrics {
 		bucket := metric.Timestamp.Truncate(interval)
 		buckets[bucket] = append(buckets[bucket], metric)
 	}
-	
+
 	// Convert to trend points
 	var trends []TrendPoint
 	for bucket, bucketMetrics := range buckets {
@@ -202,7 +201,7 @@ func (d *Dashboard) GetUsageTrends(ctx context.Context, tenantID string, period 
 			Timestamp: bucket,
 			Count:     int64(len(bucketMetrics)),
 		}
-		
+
 		// Calculate average response time
 		var totalDuration float64
 		for _, m := range bucketMetrics {
@@ -210,19 +209,19 @@ func (d *Dashboard) GetUsageTrends(ctx context.Context, tenantID string, period 
 				totalDuration += duration
 			}
 		}
-		
+
 		if len(bucketMetrics) > 0 {
 			point.AvgDuration = totalDuration / float64(len(bucketMetrics))
 		}
-		
+
 		trends = append(trends, point)
 	}
-	
+
 	// Sort by timestamp
 	sort.Slice(trends, func(i, j int) bool {
 		return trends[i].Timestamp.Before(trends[j].Timestamp)
 	})
-	
+
 	return trends, nil
 }
 
@@ -233,48 +232,49 @@ func (d *Dashboard) GetTopUsers(ctx context.Context, tenantID string, period Tim
 		From:     period.Start,
 		To:       period.End,
 	}
-	
+
 	metrics, err := d.metricsStore.QueryMetrics(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Aggregate by user
 	userStats := make(map[string]*UserStat)
-	
+
 	for _, metric := range metrics {
 		if metric.UserID == "" {
 			continue
 		}
-		
+
 		if _, exists := userStats[metric.UserID]; !exists {
 			userStats[metric.UserID] = &UserStat{
-				UserID: metric.UserID,
+				UserID:            metric.UserID,
+				ResourcesAccessed: make(map[string]int64),
 			}
 		}
-		
+
 		userStats[metric.UserID].RequestCount++
-		
+
 		if resourceType, ok := metric.Labels["resource_type"]; ok {
 			userStats[metric.UserID].ResourcesAccessed[resourceType]++
 		}
 	}
-	
+
 	// Convert to slice and sort
 	var results []UserStat
 	for _, stat := range userStats {
 		results = append(results, *stat)
 	}
-	
+
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].RequestCount > results[j].RequestCount
 	})
-	
+
 	// Apply limit
 	if limit > 0 && limit < len(results) {
 		results = results[:limit]
 	}
-	
+
 	return results, nil
 }
 
@@ -288,8 +288,8 @@ type DashboardOverview struct {
 
 // ResourceStats represents resource statistics
 type ResourceStats struct {
-	Period    time.Time                 `json:"period"`
-	TenantID  string                    `json:"tenantId"`
+	Period    TimePeriod                 `json:"period"`
+	TenantID  string                     `json:"tenantId"`
 	Resources map[string]ResourceMetrics `json:"resources"`
 }
 
@@ -311,8 +311,8 @@ type TrendPoint struct {
 
 // UserStat represents user statistics
 type UserStat struct {
-	UserID            string         `json:"userId"`
-	RequestCount      int64          `json:"requestCount"`
+	UserID            string           `json:"userId"`
+	RequestCount      int64            `json:"requestCount"`
 	ResourcesAccessed map[string]int64 `json:"resourcesAccessed"`
 }
 
@@ -342,15 +342,15 @@ func (dh *DashboardHandler) RegisterRoutes(router chi.Router) {
 func (dh *DashboardHandler) handleGetOverview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tenantID := r.Header.Get("X-Tenant-ID")
-	
+
 	period := dh.parsePeriod(r)
-	
+
 	overview, err := dh.dashboard.GetOverview(ctx, tenantID, period)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(overview)
 }
@@ -359,15 +359,15 @@ func (dh *DashboardHandler) handleGetOverview(w http.ResponseWriter, r *http.Req
 func (dh *DashboardHandler) handleGetResourceStats(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tenantID := r.Header.Get("X-Tenant-ID")
-	
+
 	period := dh.parsePeriod(r)
-	
+
 	stats, err := dh.dashboard.GetResourceStats(ctx, tenantID, period)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
 }
@@ -376,16 +376,16 @@ func (dh *DashboardHandler) handleGetResourceStats(w http.ResponseWriter, r *htt
 func (dh *DashboardHandler) handleGetTrends(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tenantID := r.Header.Get("X-Tenant-ID")
-	
+
 	period := dh.parsePeriod(r)
 	interval := dh.parseInterval(r)
-	
+
 	trends, err := dh.dashboard.GetUsageTrends(ctx, tenantID, period, interval)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(trends)
 }
@@ -394,16 +394,16 @@ func (dh *DashboardHandler) handleGetTrends(w http.ResponseWriter, r *http.Reque
 func (dh *DashboardHandler) handleGetTopUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tenantID := r.Header.Get("X-Tenant-ID")
-	
+
 	period := dh.parsePeriod(r)
 	limit := 10
-	
+
 	users, err := dh.dashboard.GetTopUsers(ctx, tenantID, period, limit)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
@@ -412,19 +412,19 @@ func (dh *DashboardHandler) handleGetTopUsers(w http.ResponseWriter, r *http.Req
 func (dh *DashboardHandler) handleGetMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tenantID := r.Header.Get("X-Tenant-ID")
-	
+
 	query := MetricQuery{
 		TenantID: tenantID,
 		From:     dh.parsePeriod(r).Start,
 		To:       dh.parsePeriod(r).End,
 	}
-	
+
 	metrics, err := dh.dashboard.metricsStore.QueryMetrics(ctx, query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(metrics)
 }
@@ -432,23 +432,23 @@ func (dh *DashboardHandler) handleGetMetrics(w http.ResponseWriter, r *http.Requ
 // handleRecordMetric handles POST /analytics/metrics
 func (dh *DashboardHandler) handleRecordMetric(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	
+
 	var metric Metric
 	if err := json.NewDecoder(r.Body).Decode(&metric); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	
+
 	// Extract tenant from header if not provided
 	if metric.TenantID == "" {
 		metric.TenantID = r.Header.Get("X-Tenant-ID")
 	}
-	
+
 	if err := dh.dashboard.RecordMetric(ctx, metric); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -459,32 +459,32 @@ func (dh *DashboardHandler) parsePeriod(r *http.Request) TimePeriod {
 		Start: now.Add(-24 * time.Hour), // Default: last 24 hours
 		End:   now,
 	}
-	
+
 	if from := r.URL.Query().Get("from"); from != "" {
 		if t, err := time.Parse(time.RFC3339, from); err == nil {
 			period.Start = t
 		}
 	}
-	
+
 	if to := r.URL.Query().Get("to"); to != "" {
 		if t, err := time.Parse(time.RFC3339, to); err == nil {
 			period.End = t
 		}
 	}
-	
+
 	return period
 }
 
 // parseInterval parses interval from request
 func (dh *DashboardHandler) parseInterval(r *http.Request) time.Duration {
 	interval := 1 * time.Hour // Default: 1 hour
-	
+
 	if i := r.URL.Query().Get("interval"); i != "" {
 		if d, err := time.ParseDuration(i); err == nil {
 			interval = d
 		}
 	}
-	
+
 	return interval
 }
 
@@ -507,14 +507,14 @@ func NewInMemoryMetricsStore() *InMemoryMetricsStore {
 func (s *InMemoryMetricsStore) StoreMetric(ctx context.Context, metric Metric) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	s.metrics = append(s.metrics, metric)
-	
+
 	// Keep only last 100000 metrics in memory
 	if len(s.metrics) > 100000 {
 		s.metrics = s.metrics[len(s.metrics)-100000:]
 	}
-	
+
 	return nil
 }
 
@@ -522,9 +522,9 @@ func (s *InMemoryMetricsStore) StoreMetric(ctx context.Context, metric Metric) e
 func (s *InMemoryMetricsStore) QueryMetrics(ctx context.Context, query MetricQuery) ([]Metric, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	var results []Metric
-	
+
 	for _, metric := range s.metrics {
 		// Apply filters
 		if query.TenantID != "" && metric.TenantID != query.TenantID {
@@ -539,7 +539,7 @@ func (s *InMemoryMetricsStore) QueryMetrics(ctx context.Context, query MetricQue
 		if !query.To.IsZero() && metric.Timestamp.After(query.To) {
 			continue
 		}
-		
+
 		if len(query.Names) > 0 {
 			found := false
 			for _, name := range query.Names {
@@ -552,10 +552,10 @@ func (s *InMemoryMetricsStore) QueryMetrics(ctx context.Context, query MetricQue
 				continue
 			}
 		}
-		
+
 		results = append(results, metric)
 	}
-	
+
 	return results, nil
 }
 
@@ -563,18 +563,18 @@ func (s *InMemoryMetricsStore) QueryMetrics(ctx context.Context, query MetricQue
 func (s *InMemoryMetricsStore) GetAggregates(ctx context.Context, tenantID string, period TimePeriod) (*Aggregates, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	aggregates := &Aggregates{
 		Period:            period,
 		TenantID:          tenantID,
 		ResourceBreakdown: make(map[string]int64),
 		UsageByHour:       make(map[int]int64),
 	}
-	
+
 	// Calculate aggregates from metrics
 	var totalDuration float64
 	var errorCount int64
-	
+
 	for _, metric := range s.metrics {
 		if metric.TenantID != tenantID {
 			continue
@@ -582,36 +582,36 @@ func (s *InMemoryMetricsStore) GetAggregates(ctx context.Context, tenantID strin
 		if metric.Timestamp.Before(period.Start) || metric.Timestamp.After(period.End) {
 			continue
 		}
-		
+
 		switch metric.Name {
 		case "api_request":
 			aggregates.TotalRequests++
-			
+
 			if duration, ok := metric.Metadata["duration_ms"].(float64); ok {
 				totalDuration += duration
 			}
-			
+
 			if status, ok := metric.Metadata["status_code"].(float64); ok {
 				if status >= 400 {
 					errorCount++
 				}
 			}
-			
+
 		case "resource_created":
 			aggregates.TotalResources++
 			aggregates.ResourceBreakdown[metric.ResourceType]++
 		}
-		
+
 		// Track usage by hour
 		hour := metric.Timestamp.Hour()
 		aggregates.UsageByHour[hour]++
 	}
-	
+
 	// Calculate averages
 	if aggregates.TotalRequests > 0 {
 		aggregates.ResponseTimeAvg = totalDuration / float64(aggregates.TotalRequests)
 		aggregates.ErrorRate = float64(errorCount) / float64(aggregates.TotalRequests)
 	}
-	
+
 	return aggregates, nil
 }

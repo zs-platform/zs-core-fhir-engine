@@ -25,7 +25,7 @@ You should see output like:
 
 ```
 2026/04/03 10:00:00 INFO ZarishSphere FHIR Engine v2.0.0
-2026/04/03 10:00:00 INFO Loading IG data from ./BD-Core-FHIR-IG...
+2026/04/03 10:00:00 INFO Loading IG data from ./config...
 2026/04/03 10:00:00 INFO Loaded 10 CodeSystems and 25 ValueSets
 2026/04/03 10:00:00 INFO FHIR R5 Server starting on :8080...
 2026/04/03 10:00:00 INFO SMART on FHIR 2.1 authentication enabled
@@ -38,7 +38,7 @@ You should see output like:
 ### 1. Check Server Health
 
 ```bash
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 ```
 
 Response:
@@ -141,7 +141,7 @@ curl http://localhost:8080/metrics
 ### View System Status
 
 ```bash
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 ```
 
 ## 🛠 Use the FHIR Library
